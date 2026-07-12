@@ -8,16 +8,24 @@ import { getDashboard } from "../services/dashboardService";
 import {
   DollarSign,
   Package,
-  ShoppingCart,
+  Boxes,
+  AlertTriangle,
   Users,
 } from "lucide-react";
 
 function Dashboard() {
-    const [dashboard, setDashboard] = useState({
+const [dashboard, setDashboard] = useState({
   products: 0,
   sales: 0,
   revenue: 0,
   customers: 0,
+
+  total_stock: 0,
+  low_stock_items: 0,
+  inventory_value: 0,
+
+  low_stock: [],
+  recent_sales: [],
 });
 
 useEffect(() => {
@@ -48,8 +56,8 @@ const fetchDashboard = async () => {
       {/* Statistics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
         <StatCard
-          title="Revenue"
-          value={`₦${dashboard.revenue.toLocaleString()}`}
+          title="Inventory Value"
+          value={`₦${dashboard.inventory_value.toLocaleString()}`}
           icon={<DollarSign size={28} />}
           color="bg-emerald-500"
         />
@@ -62,19 +70,20 @@ const fetchDashboard = async () => {
         />
 
         <StatCard
-          title="Sales"
-          value={dashboard.sales}
-          icon={<ShoppingCart size={28} />}
+          title="Inventory"
+          value={dashboard.total_stock}
+          icon={<Boxes size={28} />}
           color="bg-orange-500"
         />
 
-        <StatCard
-          title="Customers"
-          value={dashboard.customers}
-          icon={<Users size={28} />}
-          color="bg-purple-500"
-        />
-      </div>
+          <StatCard
+            title="Low Stock"
+            value={dashboard.low_stock_items}
+            icon={<AlertTriangle size={28} />}
+            color="bg-red-500"
+          />
+
+        </div>
 
       {/* Chart + Low Stock */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -84,7 +93,7 @@ const fetchDashboard = async () => {
         </div>
 
         <div>
-          <LowStock />
+          <LowStock items={dashboard.low_stock} />
         </div>
 
       </div>

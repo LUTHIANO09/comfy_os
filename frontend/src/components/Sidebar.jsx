@@ -2,6 +2,7 @@ import {
   LayoutDashboard,
   Package,
   Boxes,
+  History,
   ShoppingCart,
   Users,
   UserCog,
@@ -9,17 +10,60 @@ import {
   BarChart3,
   Settings,
 } from "lucide-react";
+import { NavLink } from "react-router-dom";
+
 
 const menuItems = [
-  { name: "Dashboard", icon: LayoutDashboard, active: true },
-  { name: "Products", icon: Package },
-  { name: "Inventory", icon: Boxes },
-  { name: "Sales", icon: ShoppingCart },
-  { name: "Customers", icon: Users },
-  { name: "Employees", icon: UserCog },
-  { name: "Expenses", icon: Receipt },
-  { name: "Reports", icon: BarChart3 },
-  { name: "Settings", icon: Settings },
+  {
+    name: "Dashboard",
+    icon: LayoutDashboard,
+    path: "/",
+  },
+  {
+    name: "Products",
+    icon: Package,
+    path: "/products",
+  },
+  {
+    name: "Inventory",
+    icon: Boxes,
+    path: "/inventory",
+  },
+  {
+  name: "Stock Movements",
+  path: "/stock-movements",
+  icon: History,
+  },
+  {
+    name: "Sales",
+    icon: ShoppingCart,
+    path: "/sales",
+  },
+  {
+    name: "Customers",
+    icon: Users,
+    path: "/customers",
+  },
+  {
+    name: "Employees",
+    icon: UserCog,
+    path: "/employees",
+  },
+  {
+    name: "Expenses",
+    icon: Receipt,
+    path: "/expenses",
+  },
+  {
+    name: "Reports",
+    icon: BarChart3,
+    path: "/reports",
+  },
+  {
+    name: "Settings",
+    icon: Settings,
+    path: "/settings",
+  },
 ];
 
 function Sidebar() {
@@ -44,21 +88,23 @@ function Sidebar() {
           const Icon = item.icon;
 
           return (
-            <button
-              key={item.name}
-              className={`w-full flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200
-              ${
-                item.active
-                  ? "bg-blue-600 text-white shadow-lg"
-                  : "text-slate-300 hover:bg-slate-800 hover:text-white"
-              }`}
-            >
-              <Icon size={20} />
+            <NavLink
+                key={item.name}
+                to={item.path}
+                className={({ isActive }) =>
+                  `w-full flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 ${
+                    isActive
+                      ? "bg-blue-600 text-white shadow-lg"
+                      : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                  }`
+                }
+              >
+                <Icon size={20} />
 
-              <span className="font-medium">
-                {item.name}
-              </span>
-            </button>
+                <span className="font-medium">
+                  {item.name}
+                </span>
+              </NavLink>
           );
         })}
 
