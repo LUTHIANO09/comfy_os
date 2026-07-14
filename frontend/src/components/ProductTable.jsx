@@ -4,6 +4,8 @@ import {
   Package,
 } from "lucide-react";
 
+import EmptyState from "./ui/EmptyState";
+
 function ProductTable({ products, onDelete, onEdit}) {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
@@ -40,18 +42,13 @@ function ProductTable({ products, onDelete, onEdit}) {
           <tbody>
             {products.length === 0 ? (
               <tr>
-                <td
-                  colSpan="6"
-                  className="text-center py-16 text-slate-400"
-                >
-                  <Package
-                    size={50}
-                    className="mx-auto mb-4"
-                  />
-
-                  No products available
-                </td>
-              </tr>
+              <td colSpan="6">
+                <EmptyState
+                  title="No Products Found"
+                  message="Click 'Add Product' to create your first product."
+                />
+              </td>
+            </tr>
             ) : (
               products.map((product) => (
                 <tr
@@ -115,7 +112,7 @@ function ProductTable({ products, onDelete, onEdit}) {
                     </button>
 
                       <button
-                        onClick={() => onDelete(product.id)}
+                        onClick={() => onDelete(product)}
                         className="text-red-600 hover:text-red-800"
                       >
                         <Trash2 size={18} />

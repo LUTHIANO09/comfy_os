@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import DashboardLayout from "../layouts/DashboardLayout";
-import { getProductsForSale } from "../services/salesService";
+import {
+  getProductsForSale,
+  checkoutSale,
+} from "../services/salesService";
 
 function Sales() {
   const [products, setProducts] = useState([]);
@@ -76,6 +79,49 @@ const decreaseQuantity = (id) => {
 
 const removeFromCart = (id) => {
   setCart(cart.filter((item) => item.id !== id));
+};
+
+const handleCheckout = async () => {
+  if (cart.length === 0) {
+    alert("Cart is empty.");
+    return;
+  }
+
+  try {
+    const payload = {
+      payment_method: paymentMethod,
+      discount: discount,
+      items: cart.map((item) => ({
+        product: item.id,
+        quantity: item.quantity,
+      })),
+    };
+
+    const response = await checkoutSale(payload);
+
+    alert(response.message);
+
+    // Clear cart
+    setCart([]);
+
+    // Reset discount
+    setDiscount(0);
+
+    // Reset payment method
+    setPaymentMethod("CASH");
+
+    // Refresh products
+    fetchProducts();
+
+  } catch (error) {
+    console.log(error.response);
+
+    alert(
+        error.response?.data?.error ||
+        JSON.stringify(error.response?.data) ||
+        error.message
+    );
+}
 };
 
 const subtotal = cart.reduce(
@@ -307,16 +353,17 @@ const total = Math.max(0, subtotal - discount);
 
                             {/* Checkout Button */}
 
-                        <button
-                        disabled={cart.length === 0}
-                        className={`mt-6 w-full py-3 rounded-xl font-semibold transition ${
-                            cart.length === 0
-                            ? "bg-slate-300 cursor-not-allowed"
-                            : "bg-blue-600 hover:bg-blue-700 text-white"
-                        }`}
-                        >
-                        Complete Sale
-                        </button>
+                                <button
+                                  onClick={handleCheckout}
+                                  disabled={cart.length === 0}
+                                  className={`mt-6 w-full py-3 rounded-xl font-semibold transition ${
+                                    cart.length === 0
+                                      ? "bg-slate-300 cursor-not-allowed"
+                                      : "bg-blue-600 hover:bg-blue-700 text-white"
+                                  }`}
+                                >
+                                  Complete Sale
+                                </button>
 
                             </div>
 

@@ -40,6 +40,11 @@ const menuItems = [
     path: "/sales",
   },
   {
+  name: "Sales History",
+  icon: Receipt,
+  path: "/sales-history",
+  },
+  {
     name: "Customers",
     icon: Users,
     path: "/customers",

@@ -4,6 +4,8 @@ import StatCard from "../components/StatCard";
 import LowStock from "../components/LowStock";
 import { useEffect, useState } from "react";
 import { getDashboard } from "../services/dashboardService";
+import CategoryChart from "../components/CategoryChart";
+import RecentSales from "../components/RecentSales";
 
 import {
   DollarSign,
@@ -26,6 +28,7 @@ const [dashboard, setDashboard] = useState({
 
   low_stock: [],
   recent_sales: [],
+  category_sales: [],
 });
 
 useEffect(() => {
@@ -55,12 +58,12 @@ const fetchDashboard = async () => {
 
       {/* Statistics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-        <StatCard
-          title="Inventory Value"
-          value={`₦${dashboard.inventory_value.toLocaleString()}`}
-          icon={<DollarSign size={28} />}
-          color="bg-emerald-500"
-        />
+          <StatCard
+            title="Revenue"
+            value={`₦${Number(dashboard.revenue).toLocaleString()}`}
+            icon={<DollarSign size={28} />}
+            color="bg-emerald-500"
+          />
 
         <StatCard
           title="Products"
@@ -69,12 +72,19 @@ const fetchDashboard = async () => {
           color="bg-blue-500"
         />
 
-        <StatCard
-          title="Inventory"
-          value={dashboard.total_stock}
-          icon={<Boxes size={28} />}
-          color="bg-orange-500"
-        />
+          <StatCard
+            title="Sales"
+            value={dashboard.sales}
+            icon={<Boxes size={28} />}
+            color="bg-orange-500"
+          />
+
+          <StatCard
+                title="Total Stock"
+                value={dashboard.total_stock}
+                icon={<Boxes size={28} />}
+                color="bg-indigo-500"
+              />
 
           <StatCard
             title="Low Stock"
@@ -86,17 +96,30 @@ const fetchDashboard = async () => {
         </div>
 
       {/* Chart + Low Stock */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
 
-        <div className="xl:col-span-2">
-          <SalesChart />
-        </div>
+            <SalesChart
+              sales={dashboard.recent_sales}
+            />
 
-        <div>
-          <LowStock items={dashboard.low_stock} />
-        </div>
+            <CategoryChart
+              categories={dashboard.category_sales}
+            />
 
-      </div>
+          </div>
+
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+                <LowStock
+                  items={dashboard.low_stock}
+                />
+
+                <RecentSales
+                  sales={dashboard.recent_sales}
+                />
+
+              </div>
+              
     </DashboardLayout>
   );
 }

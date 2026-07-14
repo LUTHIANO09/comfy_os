@@ -10,35 +10,39 @@ import {
 
 import Card from "./Card";
 
-const data = [
-  { month: "Jan", sales: 120000 },
-  { month: "Feb", sales: 180000 },
-  { month: "Mar", sales: 150000 },
-  { month: "Apr", sales: 240000 },
-  { month: "May", sales: 210000 },
-  { month: "Jun", sales: 300000 },
-];
 
-function SalesChart() {
+function SalesChart({ sales }) {
+
+  const data = sales.map((sale) => ({
+  date: sale.date,
+  sales: Number(sale.amount),
+}));
+
+
   return (
     <Card title="Sales Analytics">
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid
+                    strokeDasharray="5 5"
+                    vertical={false}
+                  />
 
-            <XAxis dataKey="month" />
+            <XAxis dataKey="date" />
 
-            <YAxis />
+            <YAxis tickFormatter={(value) => `₦${(value / 1000).toFixed(0)}k` } />
 
-            <Tooltip />
+            <Tooltip formatter={(value) => [ `₦${Number(value).toLocaleString()}`, "Sales", ]} />
 
-            <Line
-              type="monotone"
-              dataKey="sales"
-              stroke="#2563eb"
-              strokeWidth={3}
-            />
+              <Line
+                type="monotone"
+                dataKey="sales"
+                stroke="#2563eb"
+                strokeWidth={4}
+                dot={{ r: 5 }}
+                activeDot={{ r: 8 }}
+              />
           </LineChart>
         </ResponsiveContainer>
       </div>
