@@ -47,6 +47,8 @@ class Product(models.Model):
         decimal_places=2
     )
 
+    is_active = models.BooleanField(default=True)
+
     image = models.ImageField(
         upload_to="products/",
         blank=True,

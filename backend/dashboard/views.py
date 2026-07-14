@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import F
+
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -38,10 +40,23 @@ class DashboardView(APIView):
             for item in Inventory.objects.select_related("product")
         )
 
+        category_sales = (
+                    Sale.objects
+                    .filter(status=Sale.Status.COMPLETED)
+                    .values(
+                        category=F("items__product__category__name")
+                    )
+                    .annotate(
+                        revenue=models.Sum("items__total_price")
+                    )
+                    .order_by("-revenue")
+                )
+
         data = {
             "products": Product.objects.count(),
             "sales": Sale.objects.count(),
-            "revenue": 0,
+            "revenue": (Sale.objects.aggregate(
+                total=models.Sum("total_amount"))["total"] or 0),
             "customers": 0,
 
             # New dashboard cards
@@ -51,7 +66,19 @@ class DashboardView(APIView):
 
             # Existing data
             "low_stock": low_stock_data,
-            "recent_sales": [],
+            "recent_sales": [
+                        {
+                            "id": sale.id,
+                            "receipt": sale.receipt_number,
+                            "cashier": sale.cashier.username,
+                            "payment": sale.get_payment_method_display(),
+                            "amount": sale.total_amount,
+                            "date": sale.created_at.strftime("%d %b %Y"),
+                        }
+                        for sale in Sale.objects.order_by("-created_at")[:5]
+                    ],
+
+            "category_sales": list(category_sales),
         }
 
         return Response(data)
