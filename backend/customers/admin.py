@@ -5,17 +5,24 @@ from .models import Customer
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
     list_display = (
-        "full_name",
-        "phone_number",
+        "first_name",
+        "last_name",
+        "phone",
         "email",
+        "status",
     )
 
     search_fields = (
-        "full_name",
-        "phone_number",
+        "first_name",
+        "last_name",
+        "phone",
         "email",
     )
 
+    list_filter = (
+        "status",
+    )
+
     ordering = (
-        "full_name",
+        "first_name",
     )

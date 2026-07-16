@@ -1,21 +1,23 @@
 from django.db import models
 
 
-class Customer(models.Model):
+class Supplier(models.Model):
     class Status(models.TextChoices):
         ACTIVE = "ACTIVE", "Active"
         INACTIVE = "INACTIVE", "Inactive"
 
-    first_name = models.CharField(max_length=100)
+    name = models.CharField(
+        max_length=150,
+        unique=True
+    )
 
-    last_name = models.CharField(
-        max_length=100,
+    company = models.CharField(
+        max_length=150,
         blank=True
     )
 
     phone = models.CharField(
-        max_length=20,
-        unique=True
+        max_length=20
     )
 
     email = models.EmailField(
@@ -45,7 +47,9 @@ class Customer(models.Model):
     )
 
     class Meta:
-        ordering = ["first_name"]
+        ordering = ["name"]
+        verbose_name = "Supplier"
+        verbose_name_plural = "Suppliers"
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return self.name

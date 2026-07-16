@@ -62,7 +62,8 @@ INSTALLED_APPS = [
     "notifications",
     "audit",
     "business_settings", 
-    "dashboard",   
+    "dashboard", 
+    "suppliers",  
 ]
 
 MIDDLEWARE = [
