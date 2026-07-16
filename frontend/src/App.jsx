@@ -7,6 +7,8 @@ import StockMovements from "./pages/StockMovements";
 import Sales from "./pages/Sales";
 import SalesHistory from "./pages/SalesHistory";
 import { ToastContainer } from "react-toastify";
+import Suppliers from "./pages/Suppliers";
+import Customers from "./pages/Customers";
 
 function App() {
   return (
@@ -25,6 +27,10 @@ function App() {
         <Route path="/sales" element={<Sales />} />
 
         <Route path="/sales-history" element={<SalesHistory />} />
+
+        <Route path="/suppliers" element={<Suppliers />} />
+
+        <Route path="/customers"  element={<Customers />} />
 
       </Routes>
 

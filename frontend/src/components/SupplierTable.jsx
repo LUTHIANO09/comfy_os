@@ -1,35 +1,31 @@
-import {
-  Pencil,
-  Trash2,
-} from "lucide-react";
-
+import { Pencil, Trash2 } from "lucide-react";
 import EmptyState from "./ui/EmptyState";
 
-function ProductTable({
-  products,
-  onDelete,
+function SupplierTable({
+  suppliers,
   onEdit,
+  onDelete,
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div className="overflow-x-auto">
         <table className="min-w-full">
-          <thead className="bg-slate-50 border-b border-slate-200">
+          <thead className="border-b border-slate-200 bg-slate-50">
             <tr>
               <th className="px-6 py-4 text-left text-sm font-semibold">
-                Product
+                Name
               </th>
 
               <th className="px-6 py-4 text-left text-sm font-semibold">
-                SKU
+                Company
               </th>
 
               <th className="px-6 py-4 text-left text-sm font-semibold">
-                Category
+                Phone
               </th>
 
               <th className="px-6 py-4 text-left text-sm font-semibold">
-                Price
+                Email
               </th>
 
               <th className="px-6 py-4 text-left text-sm font-semibold">
@@ -43,81 +39,60 @@ function ProductTable({
           </thead>
 
           <tbody>
-            {products.length === 0 ? (
+            {suppliers.length === 0 ? (
               <tr>
                 <td colSpan="6">
                   <EmptyState
-                    title="No Products Found"
-                    message="Click 'Add Product' to create your first product."
+                    title="No Suppliers Found"
+                    message="Click 'Add Supplier' to create your first supplier."
                   />
                 </td>
               </tr>
             ) : (
-              products.map((product) => (
+              suppliers.map((supplier) => (
                 <tr
-                  key={product.id}
-                  className="border-b border-slate-100 hover:bg-slate-50 transition"
+                  key={supplier.id}
+                  className="border-b border-slate-100 transition hover:bg-slate-50"
                 >
-                  <td className="px-6 py-5">
-                    <div className="flex items-center gap-4">
-                      <img
-                        src={
-                          product.image ||
-                          "https://placehold.co/60x60"
-                        }
-                        alt={product.name}
-                        className="w-14 h-14 rounded-xl object-cover"
-                      />
-
-                      <div>
-                        <h4 className="font-semibold">
-                          {product.name}
-                        </h4>
-
-                        <p className="text-sm text-slate-500">
-                          {product.description}
-                        </p>
-                      </div>
-                    </div>
+                  <td className="px-6 py-5 font-medium">
+                    {supplier.name}
                   </td>
 
                   <td className="px-6">
-                    {product.sku}
+                    {supplier.company || "-"}
                   </td>
 
                   <td className="px-6">
-                    {product.category_name}
+                    {supplier.phone}
                   </td>
 
                   <td className="px-6">
-                    ₦{Number(product.selling_price).toLocaleString()}
+                    {supplier.email || "-"}
                   </td>
 
                   <td className="px-6">
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        product.is_active
+                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                        supplier.status === "ACTIVE"
                           ? "bg-green-100 text-green-700"
                           : "bg-red-100 text-red-700"
                       }`}
                     >
-                      {product.is_active
-                        ? "Active"
-                        : "Inactive"}
+                      {supplier.status}
                     </span>
                   </td>
 
                   <td className="px-6">
                     <div className="flex justify-end gap-3">
                       <button
-                        onClick={() => onEdit(product)}
+                        onClick={() => onEdit(supplier)}
                         className="text-blue-600 hover:text-blue-800"
                       >
                         <Pencil size={18} />
                       </button>
 
                       <button
-                        onClick={() => onDelete(product)}
+                        onClick={() => onDelete(supplier)}
                         className="text-red-600 hover:text-red-800"
                       >
                         <Trash2 size={18} />
@@ -134,4 +109,4 @@ function ProductTable({
   );
 }
 
-export default ProductTable;
+export default SupplierTable;

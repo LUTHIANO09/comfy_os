@@ -9,6 +9,7 @@ import {
   Receipt,
   BarChart3,
   Settings,
+  Truck,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
@@ -29,6 +30,11 @@ const menuItems = [
     icon: Boxes,
     path: "/inventory",
   },
+  {
+  name: "Suppliers",
+  icon: Truck,
+  path: "/suppliers",
+},
   {
   name: "Stock Movements",
   path: "/stock-movements",
