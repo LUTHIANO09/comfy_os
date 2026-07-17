@@ -9,6 +9,8 @@ import SalesHistory from "./pages/SalesHistory";
 import { ToastContainer } from "react-toastify";
 import Suppliers from "./pages/Suppliers";
 import Customers from "./pages/Customers";
+import Employees from "./pages/Employees";
+import Users from "./pages/Users";
 
 function App() {
   return (
@@ -31,6 +33,10 @@ function App() {
         <Route path="/suppliers" element={<Suppliers />} />
 
         <Route path="/customers"  element={<Customers />} />
+
+        <Route path="/employees" element={<Employees />} />
+
+        <Route path="/users" element={<Users />} />
 
       </Routes>
 

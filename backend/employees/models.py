@@ -10,17 +10,37 @@ class Employee(models.Model):
     )
 
     full_name = models.CharField(max_length=150)
-    phone_number = models.CharField(max_length=20, blank=True)
-    address = models.TextField(blank=True)
+
+    phone_number = models.CharField(
+        max_length=20,
+        blank=True
+    )
+
+    email = models.EmailField(
+        blank=True
+    )
+
+    address = models.TextField(
+        blank=True
+    )
+
     salary = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         default=0
     )
 
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(
+        default=True
+    )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
 
     class Meta:
         ordering = ["full_name"]
