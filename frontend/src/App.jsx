@@ -11,6 +11,10 @@ import Suppliers from "./pages/Suppliers";
 import Customers from "./pages/Customers";
 import Employees from "./pages/Employees";
 import Users from "./pages/Users";
+import Login from "./pages/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Expenses from "./pages/Expenses";
+
 
 function App() {
   return (
@@ -18,26 +22,108 @@ function App() {
 
       <Routes>
 
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<Login />} />
 
-        <Route path="/products" element={<Products />} />
+                    <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
 
-        <Route path="/inventory" element={<Inventory />} />
+            <Route
+              path="/products"
+              element={
+                <ProtectedRoute>
+                  <Products />
+                </ProtectedRoute>
+              }
+            />
 
-        <Route path="/stock-movements" element={<StockMovements />} />
+            <Route
+              path="/inventory"
+              element={
+                <ProtectedRoute>
+                  <Inventory />
+                </ProtectedRoute>
+              }
+            />
 
-        <Route path="/sales" element={<Sales />} />
+            <Route
+              path="/stock-movements"
+              element={
+                <ProtectedRoute>
+                  <StockMovements />
+                </ProtectedRoute>
+              }
+            />
 
-        <Route path="/sales-history" element={<SalesHistory />} />
+            <Route
+              path="/sales"
+              element={
+                <ProtectedRoute>
+                  <Sales />
+                </ProtectedRoute>
+              }
+            />
 
-        <Route path="/suppliers" element={<Suppliers />} />
+            <Route
+              path="/sales-history"
+              element={
+                <ProtectedRoute>
+                  <SalesHistory />
+                </ProtectedRoute>
+              }
+            />
 
-        <Route path="/customers"  element={<Customers />} />
+            <Route
+              path="/suppliers"
+              element={
+                <ProtectedRoute>
+                  <Suppliers />
+                </ProtectedRoute>
+              }
+            />
 
-        <Route path="/employees" element={<Employees />} />
+            <Route
+              path="/customers"
+              element={
+                <ProtectedRoute>
+                  <Customers />
+                </ProtectedRoute>
+              }
+            />
 
-        <Route path="/users" element={<Users />} />
+            <Route
+              path="/employees"
+              element={
+                <ProtectedRoute>
+                  <Employees />
+                </ProtectedRoute>
+              }
+            />
 
+            <Route
+              path="/users"
+              element={
+                <ProtectedRoute>
+                  <Users />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+                path="/expenses"
+                element={
+                  <ProtectedRoute>
+                    <Expenses />
+                  </ProtectedRoute>
+                }
+              />
+
+              
       </Routes>
 
        <ToastContainer
