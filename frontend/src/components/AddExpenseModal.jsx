@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   getExpenseCategories,
   createExpense,
+  updateExpense,
 } from "../services/expenseService";
 
 import { toast } from "react-toastify";
@@ -10,6 +11,8 @@ function AddExpenseModal({
   open,
   onClose,
   onSuccess,
+  expense,
+  isEditing,
 }) {
   const initialForm = {
     category: "",
@@ -22,14 +25,39 @@ function AddExpenseModal({
 
   const [formData, setFormData] = useState(initialForm);
 
+  useEffect(() => {
+  if (expense) {
+    setFormData({
+      category: expense.category,
+      amount: expense.amount,
+      description: expense.description || "",
+      expense_date: expense.expense_date,
+      payment_method: expense.payment_method,
+      receipt: null,
+    });
+  } else {
+    setFormData({
+      category: "",
+      amount: "",
+      description: "",
+      expense_date: "",
+      payment_method: "CASH",
+      receipt: null,
+    });
+  }
+}, [expense]);
+
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-  if (open) {
-    setFormData(initialForm);
-    loadCategories();
-  }
-    }, [open]);
+    if (open) {
+        loadCategories();
+
+        if (!expense) {
+        setFormData(initialForm);
+        }
+    }
+    }, [open, expense]);
 
 
   const loadCategories = async () => {
@@ -56,9 +84,7 @@ function AddExpenseModal({
         !formData.amount ||
         !formData.expense_date
     ) {
-        toast.error(
-        "Please fill all required fields."
-        );
+        toast.error("Please fill all required fields.");
         return;
     }
 
@@ -67,46 +93,34 @@ function AddExpenseModal({
 
         expenseData.append("category", formData.category);
         expenseData.append("amount", formData.amount);
-        expenseData.append(
-        "description",
-        formData.description
-        );
-        expenseData.append(
-        "expense_date",
-        formData.expense_date
-        );
-        expenseData.append(
-        "payment_method",
-        formData.payment_method
-        );
-        expenseData.append(
-        "created_by",
-        1
-        );
+        expenseData.append("description", formData.description);
+        expenseData.append("expense_date", formData.expense_date);
+        expenseData.append("payment_method", formData.payment_method);
+
+        expenseData.append("created_by", 1);
 
         if (formData.receipt) {
-        expenseData.append(
-            "receipt",
-            formData.receipt
-        );
+        expenseData.append("receipt", formData.receipt);
         }
 
+        if (isEditing) {
+        await updateExpense(expense.id, expenseData);
+        toast.success("Expense updated successfully.");
+        } else {
         await createExpense(expenseData);
-
-        toast.success(
-        "Expense added successfully."
-        );
+        toast.success("Expense added successfully.");
+        }
 
         onSuccess();
 
         onClose();
 
     } catch (error) {
-        console.error(error);
+       console.error(error.response?.data);
 
-        toast.error(
-        "Failed to save expense."
-        );
+            toast.error(
+            JSON.stringify(error.response?.data) || "Failed to save expense."
+            );
     }
     };
 
@@ -121,9 +135,9 @@ function AddExpenseModal({
 
         <div className="border-b p-6">
 
-          <h2 className="text-2xl font-bold">
-            Add Expense
-          </h2>
+          <h2>
+            {isEditing ? "Edit Expense" : "Add Expense"}
+            </h2>
 
         </div>
 
@@ -284,7 +298,7 @@ function AddExpenseModal({
             onClick={handleSubmit}
             className="rounded-xl bg-slate-900 px-5 py-2.5 text-white"
             >
-            Save Expense
+            {isEditing ? "Update Expense" : "Save Expense"}
             </button>
 
           </div>

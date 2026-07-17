@@ -1,17 +1,37 @@
 import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  FileText,
+} from "lucide-react";
 
 import DashboardLayout from "../layouts/DashboardLayout";
+
+import AddExpenseModal from "../components/AddExpenseModal";
+
+import ConfirmModal from "../components/ui/ConfirmModal";
+
 import {
   getExpenses,
+  deleteExpense,
 } from "../services/expenseService";
-import AddExpenseModal from "../components/AddExpenseModal";
+
+import { toast } from "react-toastify";
 
 function Expenses() {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [openModal, setOpenModal] = useState(false);
+
+  const [selectedExpense, setSelectedExpense] = useState(null);
+
+  const [isEditing, setIsEditing] = useState(false);
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const [expenseToDelete, setExpenseToDelete] = useState(null);
 
   const loadExpenses = async () => {
     try {
@@ -27,6 +47,32 @@ function Expenses() {
   useEffect(() => {
     loadExpenses();
   }, []);
+
+    const handleDelete = (expense) => {
+    setExpenseToDelete(expense);
+    setConfirmOpen(true);
+    };
+
+    const confirmDelete = async () => {
+    if (!expenseToDelete) return;
+
+    try {
+        await deleteExpense(expenseToDelete.id);
+
+        setConfirmOpen(false);
+        setExpenseToDelete(null);
+
+        await loadExpenses();
+
+        toast.success("Expense deleted successfully.");
+
+    } catch (error) {
+        console.error(error);
+
+        toast.error("Failed to delete expense.");
+    }
+    };
+
 
   return (
     <DashboardLayout>
@@ -48,7 +94,11 @@ function Expenses() {
         </div>
 
         <button
-            onClick={() => setOpenModal(true)}
+            onClick={() => {
+                    setSelectedExpense(null);
+                    setIsEditing(false);
+                    setOpenModal(true);
+                    }}
             className="flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-white hover:bg-slate-800"
             >
             <Plus size={18} />
@@ -89,8 +139,16 @@ function Expenses() {
               </th>
 
               <th className="px-6 py-4 text-left">
+                Receipt
+                </th>
+
+              <th className="px-6 py-4 text-left">
                 Created By
               </th>
+
+              <th className="px-6 py-4 text-left">
+                Actions
+                </th>
 
             </tr>
 
@@ -103,7 +161,7 @@ function Expenses() {
               <tr>
 
                 <td
-                  colSpan="6"
+                  colSpan="8"
                   className="p-10 text-center"
                 >
                   Loading...
@@ -116,7 +174,7 @@ function Expenses() {
               <tr>
 
                 <td
-                  colSpan="6"
+                  colSpan="8"
                   className="p-10 text-center text-slate-500"
                 >
                   No expenses found.
@@ -154,8 +212,58 @@ function Expenses() {
                   </td>
 
                   <td className="px-6 py-4">
+
+                    {expense.receipt ? (
+
+                        <a
+                            href={expense.receipt}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700 hover:bg-blue-100"
+                            >
+                            <FileText size={16} />
+                            View
+                            </a>
+
+                    ) : (
+
+                        <span className="text-slate-400">
+                        —
+                        </span>
+
+                    )}
+
+                    </td>
+
+                  <td className="px-6 py-4">
                     {expense.created_by_name}
                   </td>
+
+                  <td className="px-6 py-4">
+
+                    <div className="flex gap-2">
+
+                        <button
+                            onClick={() => {
+                                setSelectedExpense(expense);
+                                setIsEditing(true);
+                                setOpenModal(true);
+                            }}
+                            className="rounded-lg bg-yellow-100 p-2 text-yellow-700 hover:bg-yellow-200"
+                            >
+                            <Pencil size={18} />
+                            </button>
+
+                        <button
+                            onClick={() => handleDelete(expense)}
+                            className="rounded-lg bg-red-100 p-2 text-red-700 hover:bg-red-200"
+                            >
+                            <Trash2 size={18} />
+                            </button>
+
+                    </div>
+
+                    </td>
 
                 </tr>
 
@@ -170,10 +278,35 @@ function Expenses() {
       </div>
 
       <AddExpenseModal
-            open={openModal}
-            onClose={() => setOpenModal(false)}
-            onSuccess={loadExpenses}
-            />
+                open={openModal}
+                onClose={() => {
+                    setOpenModal(false);
+                    setSelectedExpense(null);
+                    setIsEditing(false);
+                }}
+                onSuccess={loadExpenses}
+                expense={selectedExpense}
+                isEditing={isEditing}
+                />
+
+                <ConfirmModal
+                    open={confirmOpen}
+                    title="Delete Expense"
+                    message={
+                        expenseToDelete
+                            ? `Are you sure you want to delete the ₦${Number(
+                                expenseToDelete.amount
+                            ).toLocaleString()} expense under "${expenseToDelete.category_name}"?`
+                            : ""
+                        }
+                    confirmText="Delete"
+                    cancelText="Cancel"
+                    onConfirm={confirmDelete}
+                    onCancel={() => {
+                        setConfirmOpen(false);
+                        setExpenseToDelete(null);
+                    }}
+                    />
 
     </DashboardLayout>
   );
