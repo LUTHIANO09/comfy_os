@@ -64,7 +64,8 @@ INSTALLED_APPS = [
     "audit",
     "business_settings", 
     "dashboard", 
-    "suppliers",  
+    "suppliers",
+    "settings_app",
 ]
 
 MIDDLEWARE = [

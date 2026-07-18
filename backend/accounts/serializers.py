@@ -9,6 +9,11 @@ class UserSerializer(serializers.ModelSerializer):
         allow_blank=True,
     )
 
+    role_display = serializers.CharField(
+        source="get_role_display",
+        read_only=True,
+    )
+
     class Meta:
         model = User
         fields = [
@@ -19,6 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "phone_number",
             "role",
+            "role_display",
             "is_active",
             "must_change_password",
             "password",
