@@ -1,39 +1,69 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { getSettings } from "../services/settingsService";
 
 function ReceiptModal({ sale, onClose }) {
 
-  if (!sale) return null;
+
 
   const receiptRef = useRef(null);
 
+  const [settings, setSettings] = useState(null);
+
+        useEffect(() => {
+        const loadSettings = async () => {
+            try {
+            const data = await getSettings();
+            setSettings(data);
+            } catch (error) {
+            console.error(error);
+            }
+        };
+
+        loadSettings();
+        }, []);
+
+        if (!sale) return null;
+
 const handlePrint = () => {
 
-  const printContents = receiptRef.current.innerHTML;
+  const printContents = receiptRef.current.outerHTML;
 
   const printWindow = window.open("", "", "width=800,height=700");
 
   printWindow.document.write(`
     <html>
       <head>
-        <title>Receipt</title>
+        <title>${settings?.business_name || "Receipt"}</title>
 
         <style>
 
           body{
-            font-family: Arial, sans-serif;
-            padding:30px;
-          }
+            font-family: Arial, Helvetica, sans-serif;
+            margin:0;
+            padding:0;
+            background:#fff;
+        }
 
-          table{
-            width:100%;
-            border-collapse:collapse;
-          }
+        *{
+            box-sizing:border-box;
+        }
 
-          th,
-          td{
-            padding:8px;
-            border-bottom:1px solid #ddd;
-          }
+        img{
+            max-width:120px;
+        }
+
+        hr{
+            border:none;
+            border-top:1px dashed #ccc;
+            margin:16px 0;
+        }
+
+        .text-center{
+            text-align:center;
+        }
+        @page{
+            margin:8mm;
+        }
 
         </style>
 
@@ -61,47 +91,69 @@ const handlePrint = () => {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
 
-      <div ref={receiptRef} className="bg-white rounded-2xl w-[420px] shadow-2xl overflow-hidden" >
+            <div className="w-full max-w-[360px]">
 
-        {/* Header */}
+            {/* Buttons (NOT printed) */}
+            <div className="mb-4 flex justify-end gap-3">
 
-        <div className="bg-slate-900 text-white px-6 py-5">
+                 <button
+                    onClick={handlePrint}
+                    className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+                    🖨 Print
+                </button>
 
-          <div className="flex justify-between items-center">
-
-            <div>
-
-              <h2 className="text-xl font-bold">
-                COMFY FOOTWEARS
-              </h2>
-
-              <p className="text-sm text-slate-300 mt-1">
-                Sales Receipt
-              </p>
+                <button
+                    onClick={onClose}
+                    className="rounded-lg bg-red-600 px-5 py-2 text-sm font-semibold text-white hover:bg-red-700">
+                    ✕ Close
+                </button>
 
             </div>
 
-                <div className="flex items-center gap-3">
+            {/* Receipt (printed) */}
+            <div
+            ref={receiptRef}
+            className="bg-white rounded-2xl shadow-2xl overflow-hidden">
 
-                    <button
-                        onClick={handlePrint}
-                        className="bg-white text-slate-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-200 transition"
-                    >
-                        🖨 Print
-                    </button>
+        {/* Header */}
 
-                    <button
-                        onClick={onClose}
-                        className="text-white hover:text-red-300 text-xl"
-                    >
-                        ✕
-                    </button>
+        <div className="border-b px-6 py-6">
 
+            {settings?.logo && (
+                <div className="flex justify-center mb-3">
+                <img
+                    src={settings.logo}
+                    alt="Business Logo"
+                    className="h-20 object-contain"
+                />
                 </div>
+            )}
 
-          </div>
+            <h2 className="text-center text-2xl font-bold">
+                {settings?.business_name || "COMFY FOOTWEARS"}
+            </h2>
 
-        </div>
+            <p className="mt-1 text-center text-sm text-slate-500">
+                Customer Receipt
+            </p>
+
+            <div className="mt-4 space-y-1 text-center text-sm text-slate-500">
+
+                {settings?.business_address && (
+                <p>{settings.business_address}</p>
+                )}
+
+                {settings?.phone_number && (
+                <p>{settings.phone_number}</p>
+                )}
+
+                {settings?.email && (
+                <p>{settings.email}</p>
+                )}
+
+            </div>
+
+            </div>
 
         {/* Body */}
 
@@ -130,7 +182,13 @@ const handlePrint = () => {
                     </span>
 
                     <span>
-                    {new Date(sale.created_at).toLocaleString()}
+                    {new Date(sale.created_at).toLocaleString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })}
                     </span>
 
                 </div>
@@ -171,7 +229,7 @@ const handlePrint = () => {
                     <div className="grid grid-cols-12 bg-slate-100 px-3 py-2 text-xs font-semibold uppercase">
 
                         <div className="col-span-6">
-                            Item
+                            Product
                         </div>
 
                         <div className="col-span-2 text-center">
@@ -179,7 +237,7 @@ const handlePrint = () => {
                         </div>
 
                         <div className="col-span-4 text-right">
-                            Amount
+                            Total
                         </div>
 
                     </div>
@@ -200,7 +258,8 @@ const handlePrint = () => {
                             </div>
 
                             <div className="col-span-4 text-right font-medium">
-                                ₦{Number(item.total_price).toLocaleString()}
+                                {settings?.currency || "₦"}
+                                {Number(item.total_price).toLocaleString()}
                             </div>
 
                         </div>
@@ -220,7 +279,8 @@ const handlePrint = () => {
         </span>
 
         <span>
-            ₦{Number(sale.subtotal).toLocaleString()}
+            {settings?.currency || "₦"}
+            {Number(sale.subtotal).toLocaleString()}
         </span>
 
     </div>
@@ -232,7 +292,8 @@ const handlePrint = () => {
         </span>
 
         <span>
-            ₦{Number(sale.discount).toLocaleString()}
+            {settings?.currency || "₦"}
+            {Number(sale.discount).toLocaleString()}
         </span>
 
     </div>
@@ -263,51 +324,38 @@ const handlePrint = () => {
 
                 <hr />
 
-                <div className="flex justify-between text-xl font-bold">
+                <div className="mt-2 flex items-center justify-between rounded-lg bg-slate-100 px-4 py-3 text-lg font-bold">
 
                     <span>
                         TOTAL
                     </span>
 
                     <span className="text-blue-600">
-                        ₦{Number(sale.total_amount).toLocaleString()}
+                        {settings?.currency || "₦"}
+                        {Number(sale.total_amount).toLocaleString()}
                     </span>
 
                 </div>
 
                 <hr className="my-6" />
 
-                <div className="text-center space-y-2">
 
-                    <h3 className="font-bold text-lg">
-                        COMFY FOOTWEARS
-                    </h3>
+                   <div className="text-center space-y-2">
 
-                    <p className="text-sm text-slate-500">
-                        Lagos, Nigeria
-                    </p>
+                            <p className="text-sm font-semibold">
+                                {settings?.receipt_footer || "Thank you for shopping with us!"}
+                            </p>
 
-                    <p className="text-sm text-slate-500">
-                        +234 XXX XXX XXXX
-                    </p>
+                            <p className="text-sm text-slate-500">
+                                Visit Again
+                            </p>
 
-                    <p className="text-sm text-slate-500">
-                        support@comfyfootwears.com
-                    </p>
+                            <p className="text-xs text-slate-400">
+                                Powered by COMFY OS
+                            </p>
 
-                    <div className="pt-4">
+                        </div>
 
-                        <p className="font-semibold">
-                            Thank you for shopping with us!
-                        </p>
-
-                        <p className="text-xs text-slate-500 mt-2">
-                            Goods sold are not returnable except as permitted by our return policy.
-                        </p>
-
-                    </div>
-
-                </div>
 
             </div>
 
@@ -316,6 +364,8 @@ const handlePrint = () => {
         </div>
 
       </div>
+
+    </div>
 
     </div>
   );

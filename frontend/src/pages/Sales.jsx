@@ -4,6 +4,7 @@ import {
   getProductsForSale,
   checkoutSale,
 } from "../services/salesService";
+import { toast } from "react-toastify";
 
 function Sales() {
   const [products, setProducts] = useState([]);
@@ -83,7 +84,7 @@ const removeFromCart = (id) => {
 
 const handleCheckout = async () => {
   if (cart.length === 0) {
-    alert("Cart is empty.");
+    toast.warning("Cart is empty.");
     return;
   }
 
@@ -99,7 +100,7 @@ const handleCheckout = async () => {
 
     const response = await checkoutSale(payload);
 
-    alert(response.message);
+    toast.success(response.message);
 
     // Clear cart
     setCart([]);
@@ -116,11 +117,11 @@ const handleCheckout = async () => {
   } catch (error) {
     console.log(error.response);
 
-    alert(
-        error.response?.data?.error ||
-        JSON.stringify(error.response?.data) ||
-        error.message
-    );
+    toast.error(
+      error.response?.data?.error ||
+      JSON.stringify(error.response?.data) ||
+      error.message
+  );
 }
 };
 

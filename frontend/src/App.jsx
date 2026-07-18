@@ -14,6 +14,9 @@ import Users from "./pages/Users";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Expenses from "./pages/Expenses";
+import Reports from "./pages/Reports";
+import Staff from "./pages/Staff";
+import Settings from "./pages/Settings";
 
 
 function App() {
@@ -123,7 +126,34 @@ function App() {
                 }
               />
 
-              
+              <Route
+                    path="/reports"
+                    element={
+                      <ProtectedRoute>
+                        <Reports />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  <Route
+                    path="/staff"
+                    element={
+                      <ProtectedRoute>
+                        <Staff />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  <Route
+                      path="/settings"
+                      element={
+                          <ProtectedRoute>
+                              <Settings />
+                          </ProtectedRoute>
+                      }
+                  />
+
+
       </Routes>
 
        <ToastContainer

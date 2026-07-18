@@ -54,68 +54,73 @@ function AddUserModal({
   };
 
   const handleSubmit = async () => {
-    if (
+  if (!formData.username.trim()) {
+    toast.error("Username is required.");
+    return;
+  }
+
+  if (!user && !formData.password) {
+    toast.error("Temporary password is required.");
+    return;
+  }
+
+  if (
+      formData.password &&
       formData.password !== formData.confirm_password
-    ) {
-      toast.error("Passwords do not match.");
-      return;
-    }
+    )  {
+    toast.error("Passwords do not match.");
+    return;
+  }
 
-    const payload = {
-      username: formData.username,
-      first_name: formData.first_name,
-      last_name: formData.last_name,
-      email: formData.email,
-      phone_number: formData.phone_number,
-      role: formData.role,
-      is_active: formData.is_active,
-    };
-
-    if (formData.password) {
-      payload.password = formData.password;
-    }
-
-    try {
-      if (user) {
-        await updateUser(user.id, payload);
-
-        toast.success(
-          "User updated successfully."
-        );
-      } else {
-        await createUser(payload);
-
-        toast.success(
-          "User created successfully."
-        );
-      }
-
-      setFormData(initialForm);
-
-      onClose();
-
-      if (onSuccess) {
-        onSuccess();
-      }
-    } catch (error) {
-      console.error(error);
-
-      const errors = error.response?.data;
-
-      if (errors) {
-        const firstError =
-          Object.values(errors)[0];
-
-        toast.error(
-          Array.isArray(firstError)
-            ? firstError[0]
-            : firstError
-        );
-      } else {
-        toast.error("Something went wrong.");
-      }
-    }
+  const payload = {
+    username: formData.username,
+    first_name: formData.first_name,
+    last_name: formData.last_name,
+    email: formData.email,
+    phone_number: formData.phone_number,
+    role: formData.role,
+    is_active: formData.is_active,
   };
+
+  if (formData.password) {
+    payload.password = formData.password;
+  }
+
+  try {
+    if (user) {
+      await updateUser(user.id, payload);
+
+      toast.success("User updated successfully.");
+    } else {
+      await createUser(payload);
+
+      toast.success("User created successfully.");
+    }
+
+    setFormData(initialForm);
+
+    onClose();
+
+    onSuccess?.();
+
+  } catch (error) {
+    console.error(error);
+
+    const errors = error.response?.data;
+
+    if (errors) {
+      const firstError = Object.values(errors)[0];
+
+      toast.error(
+        Array.isArray(firstError)
+          ? firstError[0]
+          : firstError
+      );
+    } else {
+      toast.error("Something went wrong.");
+    }
+  }
+};
 
   if (!open) return null;
 
@@ -135,7 +140,7 @@ function AddUserModal({
 
             <div>
               <label className="mb-2 block text-sm font-medium">
-                Username *
+                  Username <span className="text-red-500">*</span>
               </label>
 
               <input
@@ -143,7 +148,8 @@ function AddUserModal({
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3"
+                disabled={!!user}
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 disabled:bg-slate-100 disabled:text-slate-500"
               />
             </div>
 
@@ -232,6 +238,7 @@ function AddUserModal({
               </label>
 
               <input
+                autoComplete="new-password"
                 type="password"
                 name="password"
                 value={formData.password}
@@ -246,6 +253,7 @@ function AddUserModal({
               </label>
 
               <input
+                autoComplete="new-password"
                 type="password"
                 name="confirm_password"
                 value={formData.confirm_password}
@@ -272,12 +280,15 @@ function AddUserModal({
           <div className="mt-6 flex justify-end gap-3 border-t pt-6">
 
             <button
-              type="button"
-              onClick={onClose}
-              className="rounded-xl border px-5 py-2.5"
-            >
-              Cancel
-            </button>
+                type="button"
+                onClick={() => {
+                  setFormData(initialForm);
+                  onClose();
+                }}
+                className="rounded-xl border px-5 py-2.5"
+              >
+                Cancel
+              </button>
 
             <button
               type="button"
