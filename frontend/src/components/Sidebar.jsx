@@ -82,6 +82,11 @@ const menuGroups = [
         path: "/employees",
       },
       {
+        name: "Payroll",
+        icon: Receipt,
+        path: "/payroll",
+      },
+      {
         name: "Users",
         icon: Users,
         path: "/users",
@@ -138,8 +143,10 @@ function Sidebar() {
   )
     return "Sales";
 
-  if (["/employees", "/users", "/staff"].includes(location.pathname))
-    return "Staff";
+  if (
+    ["/employees", "/payroll", "/users", "/staff"].includes(location.pathname)
+  )
+      return "Staff";
 
   if (["/expenses", "/reports"].includes(location.pathname))
     return "Finance";

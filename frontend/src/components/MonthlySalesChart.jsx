@@ -14,7 +14,7 @@ function MonthlySalesChart({ data }) {
     <div className="rounded-2xl bg-white p-6 shadow">
 
       <h2 className="mb-6 text-xl font-semibold">
-        Monthly Sales vs Expenses
+        Monthly Revenue vs Expenses
       </h2>
 
       <ResponsiveContainer
@@ -54,11 +54,11 @@ function MonthlySalesChart({ data }) {
           <Legend />
 
           <Bar
-            dataKey="sales"
-            name="Sales"
+            dataKey="revenue"
+            name="Revenue"
             fill="#2563eb"
             radius={[6, 6, 0, 0]}
-          />
+            />
 
           <Bar
             dataKey="expenses"
@@ -66,6 +66,13 @@ function MonthlySalesChart({ data }) {
             fill="#ef4444"
             radius={[6, 6, 0, 0]}
           />
+
+          <Bar
+            dataKey="gross_profit"
+            name="Gross Profit"
+            fill="#16a34a"
+            radius={[6, 6, 0, 0]}
+            />
 
         </BarChart>
       </ResponsiveContainer>

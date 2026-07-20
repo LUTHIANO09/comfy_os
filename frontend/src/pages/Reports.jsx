@@ -179,67 +179,69 @@ function Reports() {
 
       {/* Summary Cards */}
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
 
         <div className="rounded-2xl bg-white p-6 shadow">
-          <h3 className="text-slate-500">
-            Total Sales
-          </h3>
+            <h3 className="text-slate-500">Revenue</h3>
+            <p className="mt-3 text-3xl font-bold text-green-600">
+                ₦{Number(report.total_sales).toLocaleString()}
+            </p>
+            </div>
 
-          <p className="mt-3 text-3xl font-bold">
-            ₦{Number(report.total_sales).toLocaleString()}
-          </p>
-        </div>
+            <div className="rounded-2xl bg-white p-6 shadow">
+            <h3 className="text-slate-500">Cost of Goods Sold</h3>
+            <p className="mt-3 text-3xl font-bold text-red-600">
+                ₦{Number(report.cost_of_goods_sold).toLocaleString()}
+            </p>
+            </div>
 
-        <div className="rounded-2xl bg-white p-6 shadow">
-          <h3 className="text-slate-500">
-            Total Expenses
-          </h3>
+            <div className="rounded-2xl bg-white p-6 shadow">
+            <h3 className="text-slate-500">Gross Profit</h3>
+            <p className="mt-3 text-3xl font-bold text-emerald-600">
+                ₦{Number(report.gross_profit).toLocaleString()}
+            </p>
+            </div>
 
-          <p className="mt-3 text-3xl font-bold">
-            ₦{Number(report.total_expenses).toLocaleString()}
-          </p>
-        </div>
+            <div className="rounded-2xl bg-white p-6 shadow">
+            <h3 className="text-slate-500">Expenses</h3>
+            <p className="mt-3 text-3xl font-bold text-orange-600">
+                ₦{Number(report.total_expenses).toLocaleString()}
+            </p>
+            </div>
 
-        <div className="rounded-2xl bg-white p-6 shadow">
-          <h3 className="text-slate-500">
-            Net Profit
-          </h3>
+            <div className="rounded-2xl bg-white p-6 shadow">
+            <h3 className="text-slate-500">Net Profit</h3>
+            <p
+                className={`mt-3 text-3xl font-bold ${
+                report.net_profit >= 0
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+            >
+                ₦{Number(report.net_profit).toLocaleString()}
+            </p>
+            </div>
 
-          <p className="mt-3 text-3xl font-bold text-green-600">
-            ₦{Number(report.net_profit).toLocaleString()}
-          </p>
-        </div>
+            <div className="rounded-2xl bg-white p-6 shadow">
+            <h3 className="text-slate-500">Profit Margin</h3>
+            <p className="mt-3 text-3xl font-bold text-blue-600">
+                {Number(report.profit_margin).toFixed(2)}%
+            </p>
+            </div>
 
-        <div className="rounded-2xl bg-white p-6 shadow">
-          <h3 className="text-slate-500">
-            Products
-          </h3>
+            <div className="rounded-2xl bg-white p-6 shadow">
+            <h3 className="text-slate-500">Products</h3>
+            <p className="mt-3 text-3xl font-bold">
+                {report.products}
+            </p>
+            </div>
 
-          <p className="mt-3 text-3xl font-bold">
-            {report.products}
-          </p>
-        </div>
-
-        <div className="rounded-2xl bg-white p-6 shadow">
-          <h3 className="text-slate-500">
-            Customers
-          </h3>
-
-          <p className="mt-3 text-3xl font-bold">
-            {report.customers}
-          </p>
-        </div>
-
-        <div className="rounded-2xl bg-white p-6 shadow">
-          <h3 className="text-slate-500">
-            Low Stock Items
-          </h3>
-
-          <p className="mt-3 text-3xl font-bold text-red-600">
-            {report.low_stock}
-          </p>
-        </div>
+            <div className="rounded-2xl bg-white p-6 shadow">
+            <h3 className="text-slate-500">Low Stock Items</h3>
+            <p className="mt-3 text-3xl font-bold text-red-600">
+                {report.low_stock}
+            </p>
+            </div>
 
       </div>
 

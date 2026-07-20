@@ -19,6 +19,7 @@ import Staff from "./pages/Staff";
 import Settings from "./pages/Settings";
 import "react-toastify/dist/ReactToastify.css";
 import ReturnsHistory from "./pages/ReturnsHistory";
+import Payroll from "./pages/Payroll";
 
 
 function App() {
@@ -163,6 +164,15 @@ function App() {
                           </ProtectedRoute>
                       }
                   />
+                  <Route
+                      path="/payroll"
+                      element={
+                          <ProtectedRoute>
+                              <Payroll />
+                          </ProtectedRoute>
+                      }
+                  />
+                  
 
 
       </Routes>

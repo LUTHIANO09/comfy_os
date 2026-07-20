@@ -151,6 +151,7 @@ function Settings() {
 
             <input
                 type="text"
+                min="0"
                 name="phone_number"
                 value={formData.phone_number}
                 onChange={handleChange}
@@ -207,6 +208,7 @@ function Settings() {
 
             <input
                 type="number"
+                min="0"
                 name="low_stock_threshold"
                 value={formData.low_stock_threshold}
                 onChange={handleChange}
@@ -221,6 +223,7 @@ function Settings() {
 
             <input
                 type="number"
+                min="0"
                 step="0.01"
                 name="tax_percentage"
                 value={formData.tax_percentage}
@@ -248,6 +251,20 @@ function Settings() {
                 Business Logo
             </label>
 
+            {formData.logo_url && (
+                <div className="mb-4">
+                    <p className="mb-2 text-sm font-medium">
+                    Current Logo
+                    </p>
+
+                    <img
+                    src={formData.logo_url}
+                    alt="Business Logo"
+                    className="h-24 rounded-xl border"
+                    />
+                </div>
+                )}
+
             <input
                 type="file"
                 name="logo"
@@ -264,7 +281,7 @@ function Settings() {
             <button
             onClick={handleSubmit}
             disabled={saving}
-            className="rounded-xl bg-slate-900 px-6 py-3 font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+            className="rounded-xl bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
             {saving ? "Saving..." : "Save Changes"}
             </button>
