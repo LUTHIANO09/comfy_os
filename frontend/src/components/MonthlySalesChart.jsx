@@ -21,7 +21,15 @@ function MonthlySalesChart({ data }) {
         width="100%"
         height={420}
       >
-        <BarChart data={data}>
+        <BarChart
+                data={data}
+                margin={{
+                    top: 20,
+                    right: 20,
+                    left: 20,
+                    bottom: 20,
+                }}
+            >
 
           <CartesianGrid
             stroke="#e2e8f0"
@@ -31,6 +39,7 @@ function MonthlySalesChart({ data }) {
           <XAxis dataKey="month" />
 
           <YAxis
+             width={90}
             tickFormatter={(value) =>
                 `₦${Number(value).toLocaleString()}`
             }

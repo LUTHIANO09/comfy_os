@@ -8,19 +8,30 @@ import MonthlySalesChart from "../components/MonthlySalesChart";
 
 import { exportReportPDF } from "../utils/exportPDF";
 
+import { exportReportExcel } from "../utils/exportExcel";
+
 function Reports() {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const [filter, setFilter] = useState("today");
 
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   useEffect(() => {
-    loadReport(filter);
+    if (filter !== "custom") {
+        loadReport(filter);
+    }
     }, [filter]);
 
   const loadReport = async (period = filter) => {
     try {
-      const data = await getDashboardReport(period);
+      const data = await getDashboardReport(
+            period,
+            startDate,
+            endDate
+        );
       setReport(data);
     } catch (error) {
       console.error(error);
@@ -104,18 +115,67 @@ function Reports() {
                 Export PDF
                 </button>
 
-        <button
-            onClick={() => setFilter("custom")}
-            className={`rounded-xl px-5 py-2 ${
-                filter === "custom"
-                ? "bg-slate-900 text-white"
-                : "border border-slate-300 hover:bg-slate-100"
-            }`}
-            >
-            Custom
-            </button>
+                <button
+                    onClick={() => exportReportExcel(report)}
+                    className="rounded-xl bg-green-600 px-5 py-2 text-white hover:bg-green-700"
+                >
+                    Export Excel
+                </button>
+
+                <button
+                    onClick={() => setFilter("custom")}
+                    className={`rounded-xl px-5 py-2 ${
+                        filter === "custom"
+                            ? "bg-slate-900 text-white"
+                            : "border border-slate-300 hover:bg-slate-100"
+                    }`}
+                >
+                    Custom
+                </button>
+
+                    
+            
 
         </div>
+
+                        {filter === "custom" && (
+                <div className="mb-8 flex flex-wrap items-end gap-4">
+
+                    <div>
+                    <label className="mb-1 block text-sm font-medium">
+                        Start Date
+                    </label>
+
+                    <input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="rounded-lg border border-slate-300 px-3 py-2"
+                    />
+                    </div>
+
+                    <div>
+                    <label className="mb-1 block text-sm font-medium">
+                        End Date
+                    </label>
+
+                    <input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="rounded-lg border border-slate-300 px-3 py-2"
+                    />
+                    </div>
+
+                    <button
+                    onClick={() => loadReport("custom")}
+                    className="rounded-lg bg-blue-600 px-5 py-2 text-white hover:bg-blue-700"
+                    >
+                    Apply
+                    </button>
+
+                </div>
+                )}
 
       {/* Summary Cards */}
 
@@ -190,6 +250,163 @@ function Reports() {
             data={report.monthly_summary}
         />
         </div>
+
+        <div className="mt-10 overflow-hidden rounded-2xl bg-white shadow">
+
+                <div className="border-b px-6 py-4">
+
+                    <h2 className="text-lg font-semibold">
+                        Top Selling Products
+                    </h2>
+
+                </div>
+
+                <table className="min-w-full">
+
+                    <thead className="bg-slate-50">
+
+                        <tr>
+                            <th className="px-5 py-3 text-left">
+                                S/N
+                            </th>
+
+
+                            <th className="px-6 py-3 text-left">
+                                Product
+                            </th>
+
+                            <th className="px-6 py-3 text-center">
+                                Qty Sold
+                            </th>
+
+                            <th className="px-6 py-3 text-right">
+                                Revenue
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {report.top_products.map((product, index) => (
+
+                            <tr
+                                key={product.product__name}
+                                className="border-t"
+                            >
+
+                                <td className="px-5 py-3">
+                                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 font-bold">
+                                        {index + 1}
+                                    </span>
+                                </td>
+
+                               <td className="px-6 py-4 font-medium">
+                                    {product.product__name}
+                                </td>
+
+                                <td className="px-5 py-3 text-center font-medium">
+                                    {product.quantity_sold}
+                                </td>
+
+                                <td className="px-6 py-4 text-right font-semibold text-green-600">
+                                    ₦{Number(product.revenue).toLocaleString()}
+                                </td>
+
+                            </tr>
+
+                        ))}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+                        {/* Top Customers
+
+            <div className="mt-10 overflow-hidden rounded-2xl bg-white shadow">
+
+                <div className="border-b px-6 py-4">
+                    <h2 className="text-lg font-semibold">
+                        Top Customers
+                    </h2>
+                </div>
+
+                <table className="min-w-full">
+
+                    <thead className="bg-slate-50">
+
+                        <tr>
+                            <th className="px-5 py-3 text-left">
+                                Rank
+                            </th>
+
+                            <th className="px-5 py-3 text-left">
+                                Customer
+                            </th>
+
+                            <th className="px-5 py-3 text-left">
+                                Orders
+                            </th>
+
+                            <th className="px-5 py-3 text-left">
+                                Total Spent
+                            </th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {report.top_customers.length === 0 ? (
+
+                            <tr>
+                                <td
+                                    colSpan="4"
+                                    className="p-6 text-center text-slate-500"
+                                >
+                                    No customer data found.
+                                </td>
+                            </tr>
+
+                        ) : (
+
+                            report.top_customers.map((customer, index) => (
+
+                                <tr
+                                    key={customer.customer__name}
+                                    className="border-t"
+                                >
+
+                                    <td className="px-5 py-3 font-semibold">
+                                        #{index + 1}
+                                    </td>
+
+                                    <td className="px-5 py-3">
+                                        {customer.customer__name}
+                                    </td>
+
+                                    <td className="px-5 py-3">
+                                        {customer.total_orders}
+                                    </td>
+
+                                    <td className="px-5 py-3 font-semibold text-green-600">
+                                        ₦{Number(customer.total_spent).toLocaleString()}
+                                    </td>
+
+                                </tr>
+
+                            ))
+
+                        )}
+
+                    </tbody>
+
+                </table>
+
+            </div> */}
 
       {/* Recent Activity */}
 

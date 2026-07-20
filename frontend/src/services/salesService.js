@@ -14,12 +14,30 @@ export const checkoutSale = async (saleData) => {
   return response.data;
 };
 
-export const getSales = async (
-  receipt = "",
-  date = ""
-) => {
+export const getSales = async (receipt = "", date = "") => {
+  const response = await api.get("/sales/", {
+    params: {
+      receipt,
+      date,
+    },
+  });
 
-  const response = await api.get("sales/", {
+  return response.data;
+};
+
+export const returnSale = async (saleId, reason = "") => {
+  const response = await api.post(
+    `/sales/${saleId}/return/`,
+    {
+      reason,
+    }
+  );
+
+  return response.data;
+};
+
+export const getReturnedSales = async (receipt = "", date = "") => {
+  const response = await api.get("/sales/returns/", {
     params: {
       receipt,
       date,

@@ -6,10 +6,14 @@ function ConfirmModal({
   message,
   confirmText = "Confirm",
   cancelText = "Cancel",
-  confirmColor = "bg-red-600",
   onConfirm,
   onCancel,
+
+  showReason = false,
+  reason = "",
+  setReason = () => {},
 }) {
+
   if (!open) return null;
 
   return (
@@ -23,12 +27,38 @@ function ConfirmModal({
           </h2>
         </div>
 
+        
         {/* Body */}
-        <div className="px-6 py-5">
-          <p className="text-slate-600 leading-relaxed">
-            {message}
-          </p>
-        </div>
+          <div className="px-6 py-5 space-y-4">
+            <p className="text-slate-600 leading-relaxed">
+              {message}
+            </p>
+
+            {showReason && (
+              <div>
+                <label className="block mb-2 text-sm font-medium text-slate-700">
+                  Reason for return
+                </label>
+
+                <textarea
+                  rows={4}
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder="Enter reason for returning this sale..."
+                  className="
+                    w-full
+                    rounded-xl
+                    border
+                    border-slate-300
+                    p-3
+                    focus:outline-none
+                    focus:ring-2
+                    focus:ring-red-500
+                  "
+                />
+              </div>
+            )}
+          </div>
 
         {/* Footer */}
         <div className="flex justify-end gap-3 border-t px-6 py-4">

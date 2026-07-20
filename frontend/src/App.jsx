@@ -17,6 +17,8 @@ import Expenses from "./pages/Expenses";
 import Reports from "./pages/Reports";
 import Staff from "./pages/Staff";
 import Settings from "./pages/Settings";
+import "react-toastify/dist/ReactToastify.css";
+import ReturnsHistory from "./pages/ReturnsHistory";
 
 
 function App() {
@@ -149,6 +151,15 @@ function App() {
                       element={
                           <ProtectedRoute>
                               <Settings />
+                          </ProtectedRoute>
+                      }
+                  />
+
+                  <Route
+                      path="/returns"
+                      element={
+                          <ProtectedRoute>
+                              <ReturnsHistory />
                           </ProtectedRoute>
                       }
                   />

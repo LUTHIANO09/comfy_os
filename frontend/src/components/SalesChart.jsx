@@ -31,7 +31,7 @@ function SalesChart({ sales }) {
 
             <XAxis dataKey="date" />
 
-            <YAxis tickFormatter={(value) => `₦${(value / 1000).toFixed(0)}k` } />
+            <YAxis width={90} tickFormatter={(value) => `₦${(value / 1000).toFixed(0)}k` } />
 
             <Tooltip formatter={(value) => [ `₦${Number(value).toLocaleString()}`, "Sales", ]} />
 

@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
 import DashboardLayout from "../layouts/DashboardLayout";
-import { getSales } from "../services/salesService";
+import {
+  getSales,
+  returnSale,
+} from "../services/salesService";
 import { Search } from "lucide-react";
 import ReceiptModal from "../components/ReceiptModal";
+import ConfirmModal from "../components/ui/ConfirmModal";
+
+import { toast } from "react-toastify";
 
 function SalesHistory() {
   const [sales, setSales] = useState([]);
@@ -19,6 +25,10 @@ const [summary, setSummary] = useState({
   const [date, setDate] = useState("");
 
   const [selectedSale, setSelectedSale] = useState(null);
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [saleToReturn, setSaleToReturn] = useState(null);
+  const [returnReason, setReturnReason] = useState("");
 
   useEffect(() => {
   fetchSales();
@@ -38,6 +48,7 @@ const fetchSales = async () => {
     console.error(error);
   }
 };
+
 
 return (
     <DashboardLayout>
@@ -248,7 +259,77 @@ return (
                 </td>
 
                 <td className="px-6 py-4">
-                  {sale.status_display}
+                  {sale.status === "COMPLETED" && (
+                    <span
+                      className="
+                        inline-flex
+                        items-center
+                        rounded-full
+                        bg-green-100
+                        px-3
+                        py-1
+                        text-xs
+                        font-semibold
+                        text-green-700
+                      "
+                    >
+                      Completed
+                    </span>
+                  )}
+
+                  {sale.status === "RETURNED" && (
+                    <span
+                      className="
+                        inline-flex
+                        items-center
+                        rounded-full
+                        bg-red-100
+                        px-3
+                        py-1
+                        text-xs
+                        font-semibold
+                        text-red-700
+                      "
+                    >
+                      Returned
+                    </span>
+                  )}
+
+                  {sale.status === "DRAFT" && (
+                    <span
+                      className="
+                        inline-flex
+                        items-center
+                        rounded-full
+                        bg-yellow-100
+                        px-3
+                        py-1
+                        text-xs
+                        font-semibold
+                        text-yellow-700
+                      "
+                    >
+                      Draft
+                    </span>
+                  )}
+
+                  {sale.status === "CANCELLED" && (
+                    <span
+                      className="
+                        inline-flex
+                        items-center
+                        rounded-full
+                        bg-slate-200
+                        px-3
+                        py-1
+                        text-xs
+                        font-semibold
+                        text-slate-700
+                      "
+                    >
+                      Cancelled
+                    </span>
+                  )}
                 </td>
 
                 <td className="px-6 py-4 font-semibold">
@@ -262,26 +343,65 @@ return (
                   ).toLocaleDateString()}
                 </td>
 
-                <td className="px-6 py-4">
+                <td className="px-6 py-4 space-x-2">
 
-                    <button
-                        onClick={() => setSelectedSale(sale)}
-                        className="
-                            bg-blue-600
-                            hover:bg-blue-700
-                            text-white
-                            px-4
-                            py-2
-                            rounded-lg
-                            text-sm
-                            font-medium
-                            transition
-                        "
-                    >
-                        View Receipt
-                    </button>
+                <button
+                  onClick={() => setSelectedSale(sale)}
+                  className="
+                    bg-blue-600
+                    hover:bg-blue-700
+                    text-white
+                    px-4
+                    py-2
+                    rounded-lg
+                    text-sm
+                  "
+                >
+                  Receipt
+                </button>
 
-                </td>
+                {sale.status === "COMPLETED" ? (
+                <button
+                  onClick={() => {
+                    setSaleToReturn(sale);
+                    setReturnReason("");
+                    setConfirmOpen(true);
+                  }}
+                  className="
+                    ml-2
+                    bg-red-600
+                    hover:bg-red-700
+                    text-white
+                    px-4
+                    py-2
+                    rounded-lg
+                    text-sm
+                    font-medium
+                    transition
+                  "
+                >
+                  Return
+                </button>
+              ) : (
+                <span
+                  className="
+                    ml-2
+                    inline-flex
+                    items-center
+                    rounded-lg
+                    bg-green-100
+                    px-4
+                    py-2
+                    text-sm
+                    font-medium
+                    text-green-700
+                  "
+                >
+                  Returned
+                </span>
+              )}
+
+              </td>
 
               </tr>
 
@@ -294,6 +414,57 @@ return (
       </div>
 
             <ReceiptModal sale={selectedSale} onClose={() => setSelectedSale(null)} />
+
+            <ConfirmModal
+                  open={confirmOpen}
+                  title="Return Sale"
+                  message="Are you sure you want to return this sale? This action cannot be undone."
+
+                  showReason={true}
+                  reason={returnReason}
+                  setReason={setReturnReason}
+
+                  confirmText="Return Sale"
+                  cancelText="Cancel"
+
+                  onCancel={() => {
+                    setConfirmOpen(false);
+                    setSaleToReturn(null);
+                    setReturnReason("");
+                  }}
+
+                  onConfirm={async () => {
+                    if (!saleToReturn) return;
+
+                    if (!returnReason.trim()) {
+                      toast.error("Please enter a reason for the return.");
+                      return;
+                    }
+
+                    try {
+                      await returnSale(
+                          saleToReturn.id,
+                          returnReason
+                        );
+
+                      toast.success("Sale returned successfully.");
+
+                      setConfirmOpen(false);
+                      setSaleToReturn(null);
+                      setReturnReason("");
+
+                      fetchSales();
+
+                    } catch (error) {
+                      console.error(error);
+
+                      toast.error(
+                        error.response?.data?.detail ||
+                        "Unable to return sale."
+                      );
+                    }
+                  }}
+                />
 
     </DashboardLayout>
   );

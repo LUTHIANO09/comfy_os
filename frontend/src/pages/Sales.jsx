@@ -6,6 +6,7 @@ import {
 } from "../services/salesService";
 import { toast } from "react-toastify";
 
+
 function Sales() {
   const [products, setProducts] = useState([]);
 
