@@ -54,9 +54,16 @@ class DashboardView(APIView):
 
         data = {
             "products": Product.objects.count(),
-            "sales": Sale.objects.count(),
-            "revenue": (Sale.objects.aggregate(
-                total=models.Sum("total_amount"))["total"] or 0),
+            "sales": Sale.objects.filter(
+                status=Sale.Status.COMPLETED
+            ).count(),
+            "revenue": (
+                Sale.objects.filter(
+                    status=Sale.Status.COMPLETED
+                ).aggregate(
+                    total=models.Sum("total_amount")
+                )["total"] or 0
+            ),
             "customers": 0,
 
             # New dashboard cards
@@ -75,7 +82,9 @@ class DashboardView(APIView):
                             "amount": sale.total_amount,
                             "date": sale.created_at.strftime("%d %b %Y"),
                         }
-                        for sale in Sale.objects.order_by("-created_at")[:5]
+                        for sale in Sale.objects.filter(
+                            status=Sale.Status.COMPLETED
+                        ).order_by("-created_at")[:5]
                     ],
 
             "category_sales": list(category_sales),

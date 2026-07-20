@@ -112,3 +112,37 @@ class SaleItem(models.Model):
 
     def __str__(self):
         return f"{self.product.name} x {self.quantity}"
+
+
+class SaleReturn(models.Model):
+    sale = models.OneToOneField(
+        Sale,
+        on_delete=models.CASCADE,
+        related_name="sale_return"
+    )
+
+    reason = models.TextField(blank=True)
+
+    refund_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0
+    )
+
+    returned_by = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        related_name="processed_returns"
+    )
+
+    returned_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+        ordering = ["-returned_at"]
+        verbose_name = "Sale Return"
+        verbose_name_plural = "Sale Returns"
+
+    def __str__(self):
+        return f"Return - {self.sale.receipt_number}"

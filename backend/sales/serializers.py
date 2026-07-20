@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Sale, SaleItem
+from .models import SaleReturn
 
 
 class SaleItemSerializer(serializers.ModelSerializer):
@@ -59,3 +60,25 @@ class CheckoutSerializer(serializers.Serializer):
     )
 
     items = CheckoutItemSerializer(many=True)
+
+class SaleReturnSerializer(serializers.ModelSerializer):
+    receipt_number = serializers.CharField(
+        source="sale.receipt_number",
+        read_only=True,
+    )
+
+    cashier_name = serializers.CharField(
+        source="sale.cashier.first_name",
+        read_only=True,
+    )
+
+    class Meta:
+        model = SaleReturn
+        fields = [
+            "id",
+            "receipt_number",
+            "cashier_name",
+            "reason",
+            "refund_amount",
+            "returned_at",
+        ]

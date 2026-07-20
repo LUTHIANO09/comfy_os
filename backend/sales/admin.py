@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Sale, SaleItem
+from .models import SaleReturn
 
 
 @admin.register(Sale)
@@ -41,4 +42,13 @@ class SaleItemAdmin(admin.ModelAdmin):
     search_fields = (
         "sale__receipt_number",
         "product__name",
+    )
+
+@admin.register(SaleReturn)
+class SaleReturnAdmin(admin.ModelAdmin):
+    list_display = (
+        "sale",
+        "refund_amount",
+        "returned_by",
+        "returned_at",
     )

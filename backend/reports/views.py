@@ -1,4 +1,5 @@
-from django.db.models import Sum
+from django.db.models import Sum, F, Count
+from sales.models import Sale, SaleItem
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
 from datetime import timedelta
@@ -21,6 +22,9 @@ class DashboardReportView(APIView):
 
     def get(self, request):
         period = request.GET.get("period", "today")
+
+        start_date = request.GET.get("start_date")
+        end_date = request.GET.get("end_date")
 
         today = timezone.localdate()
 
@@ -68,6 +72,15 @@ class DashboardReportView(APIView):
 
             expense_queryset = expense_queryset.filter(
                 expense_date__year=today.year
+            )
+
+        elif period == "custom" and start_date and end_date:
+            sales_queryset = sales_queryset.filter(
+                created_at__date__range=[start_date, end_date]
+            )
+
+            expense_queryset = expense_queryset.filter(
+                expense_date__range=[start_date, end_date]
             )
 
         total_sales = (
@@ -139,6 +152,33 @@ class DashboardReportView(APIView):
                 "expenses": expense_dict.get(month, 0),
             })
 
+        top_products = (
+            SaleItem.objects
+            .filter(sale__in=sales_queryset)
+            .values("product__name")
+            .annotate(
+                quantity_sold=Sum("quantity"),
+                revenue=Sum("total_price"),
+            )
+            .order_by("-quantity_sold", "-revenue")[:5]
+        )
+
+        # top_customers = (
+        #     Sale.objects
+        #     .filter(
+        #         id__in=sales_queryset.values("id"),
+        #         customer__isnull=False
+        #     )
+        #     .values(
+        #         "customer__name"
+        #     )
+        #     .annotate(
+        #         total_orders=Count("id"),
+        #         total_spent=Sum("total_amount")
+        #     )
+        #     .order_by("-total_spent")[:5]
+        # )
+
         return Response({
             "total_sales": total_sales,
             "total_expenses": total_expenses,
@@ -158,4 +198,8 @@ class DashboardReportView(APIView):
             ).data,
 
             "monthly_summary": monthly_summary,
+            
+            "top_products": list(top_products),
+
+            # "top_customers": list(top_customers),
         })

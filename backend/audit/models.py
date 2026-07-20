@@ -10,11 +10,14 @@ class AuditLog(models.Model):
         blank=True
     )
 
-    action = models.CharField(max_length=255)
+    action = models.CharField(max_length=100)
 
     model_name = models.CharField(max_length=100)
 
-    object_id = models.PositiveIntegerField()
+    object_id = models.PositiveIntegerField(
+        null=True,
+        blank=True
+    )
 
     description = models.TextField(blank=True)
 
@@ -22,8 +25,7 @@ class AuditLog(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
-        verbose_name = "Audit Log"
-        verbose_name_plural = "Audit Logs"
+
 
     def __str__(self):
-        return f"{self.user} - {self.action}"
+        return f"{self.action} - {self.model_name}"
