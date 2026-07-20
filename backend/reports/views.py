@@ -3,6 +3,7 @@ from sales.models import Sale, SaleItem
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
 from datetime import timedelta
+from decimal import Decimal
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -90,11 +91,33 @@ class DashboardReportView(APIView):
             or 0
         )
 
+        cost_of_goods_sold = (
+            SaleItem.objects
+            .filter(sale__in=sales_queryset)
+            .aggregate(
+                total=Sum(
+                    F("quantity") * F("product__cost_price")
+                )
+            )
+            .get("total")
+            or Decimal("0.00")
+        )
+
+        gross_profit = total_sales - cost_of_goods_sold
+
         total_expenses = (
             expense_queryset
             .aggregate(total=Sum("amount"))
             .get("total")
             or 0
+        )
+
+        net_profit = gross_profit - total_expenses
+
+        profit_margin = (
+            (gross_profit / total_sales) * 100
+            if total_sales > 0
+            else Decimal("0.00")
         )
 
         recent_sales = sales_queryset.order_by("-created_at")[:5]
@@ -113,7 +136,12 @@ class DashboardReportView(APIView):
             sales_queryset
             .annotate(month=TruncMonth("created_at"))
             .values("month")
-            .annotate(total=Sum("total_amount"))
+            .annotate(
+                revenue=Sum("total_amount"),
+                cost_of_goods_sold=Sum(
+                    F("items__product__cost_price") * F("items__quantity")
+                ),
+            )
             .order_by("month")
         )
 
@@ -128,7 +156,10 @@ class DashboardReportView(APIView):
         monthly_summary = []
 
         sales_dict = {
-            item["month"].strftime("%b"): item["total"]
+            item["month"].strftime("%b"): {
+                "revenue": item["revenue"] or 0,
+                "cost_of_goods_sold": item["cost_of_goods_sold"] or 0,
+            }
             for item in monthly_sales
         }
 
@@ -146,10 +177,15 @@ class DashboardReportView(APIView):
         )
 
         for month in months:
+            revenue = sales_dict.get(month, {}).get("revenue", 0)
+            cost_of_goods_sold = sales_dict.get(month, {}).get("cost_of_goods_sold", 0)
+            expenses = expense_dict.get(month, 0)
+
             monthly_summary.append({
                 "month": month,
-                "sales": sales_dict.get(month, 0),
-                "expenses": expense_dict.get(month, 0),
+                "revenue": revenue,
+                "expenses": expenses,
+                "gross_profit": revenue - cost_of_goods_sold,
             })
 
         top_products = (
@@ -181,8 +217,12 @@ class DashboardReportView(APIView):
 
         return Response({
             "total_sales": total_sales,
+            "cost_of_goods_sold": cost_of_goods_sold,
+            "gross_profit": gross_profit,
             "total_expenses": total_expenses,
-            "net_profit": total_sales - total_expenses,
+            "net_profit": net_profit,
+            "profit_margin": round(profit_margin, 2),
+
             "products": total_products,
             "customers": total_customers,
             "low_stock": low_stock,
@@ -198,7 +238,7 @@ class DashboardReportView(APIView):
             ).data,
 
             "monthly_summary": monthly_summary,
-            
+
             "top_products": list(top_products),
 
             # "top_customers": list(top_customers),

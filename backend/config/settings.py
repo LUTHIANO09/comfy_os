@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "dashboard", 
     "suppliers",
     "settings_app",
+    "payroll",
 ]
 
 MIDDLEWARE = [
