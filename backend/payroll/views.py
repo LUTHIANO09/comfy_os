@@ -16,6 +16,9 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 from rest_framework import generics
 
+from notifications.utils import create_notification
+from notifications.models import Notification
+
 
 class RunPayrollAPIView(APIView):
     permission_classes = [AllowAny]
@@ -86,6 +89,16 @@ class PayPayrollAPIView(APIView):
                 expense_date=timezone.localdate(),
                 payment_method=Expense.PaymentMethod.TRANSFER,
                 created_by=request.user,
+            )
+
+            create_notification(
+                user=request.user,
+                title="Payroll Paid",
+                message=(
+                    f"Salary paid to "
+                    f"{payroll.employee.full_name}."
+                ),
+                notification_type=Notification.NotificationType.PAYROLL,
             )
 
             payroll.status = PayrollRecord.Status.PAID

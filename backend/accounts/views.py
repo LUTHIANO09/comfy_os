@@ -26,3 +26,10 @@ class UserRetrieveUpdateDestroyView(
             )
 
         instance.delete()
+
+class CurrentUserView(generics.RetrieveAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user

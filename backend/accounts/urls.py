@@ -3,6 +3,7 @@ from django.urls import path
 from .views import (
     UserListCreateView,
     UserRetrieveUpdateDestroyView,
+    CurrentUserView,
 )
 
 urlpatterns = [
@@ -16,5 +17,11 @@ urlpatterns = [
         "users/<int:pk>/",
         UserRetrieveUpdateDestroyView.as_view(),
         name="user-detail",
+    ),
+
+    path(
+        "me/",
+        CurrentUserView.as_view(),
+        name="current-user",
     ),
 ]

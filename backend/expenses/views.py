@@ -7,6 +7,8 @@ from .serializers import (
     ExpenseCategorySerializer,
     ExpenseSerializer,
 )
+from notifications.utils import create_notification
+from notifications.models import Notification
 
 
 class ExpenseCategoryListCreateView(
@@ -40,6 +42,16 @@ class ExpenseListCreateView(
         MultiPartParser,
         FormParser,
     )
+
+    def perform_create(self, serializer):
+        expense = serializer.save()
+
+        create_notification(
+            user=self.request.user,
+            title="New Expense",
+            message=f"{expense.category.name} expense of ₦{expense.amount} recorded.",
+            notification_type=Notification.NotificationType.EXPENSE,
+        )
 
 
 class ExpenseRetrieveUpdateDestroyView(

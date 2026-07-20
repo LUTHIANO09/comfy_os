@@ -25,6 +25,9 @@ from django.db.models import Q
 
 from django.db import transaction
 
+from notifications.utils import create_notification
+from notifications.models import Notification
+
 
 
 
@@ -152,6 +155,13 @@ class CheckoutView(APIView):
 
         sale.calculate_totals()
         sale.save()
+
+        create_notification(
+            user=request.user,
+            title="New Sale",
+            message=f"Receipt {sale.receipt_number} completed successfully.",
+            notification_type=Notification.NotificationType.SALE,
+        )
 
         return Response(
             {
