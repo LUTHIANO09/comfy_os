@@ -16,6 +16,20 @@ from customers.models import Customer
 from inventory.models import Inventory
 from sales.serializers import SaleSerializer
 from expenses.serializers import ExpenseSerializer
+from openpyxl import Workbook
+from django.http import HttpResponse
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Table,
+    TableStyle,
+    Paragraph,
+)
+
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import inch
+from settings_app.models import Setting
+from reportlab.platypus import Image
 
 
 class DashboardReportView(APIView):
@@ -243,3 +257,184 @@ class DashboardReportView(APIView):
 
             # "top_customers": list(top_customers),
         })
+
+class ExportReportExcelView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+
+        settings = Setting.load()
+
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.title = "Business Report"
+        today = timezone.localdate()
+
+        sales = (
+            Sale.objects.filter(status="COMPLETED")
+            .aggregate(total=Sum("total_amount"))
+            .get("total")
+            or 0
+        )
+
+        expenses = (
+            Expense.objects.aggregate(total=Sum("amount"))
+            .get("total")
+            or 0
+        )
+
+        sheet["A1"] = settings.business_name
+        sheet["A2"] = settings.business_address
+        sheet["A3"] = settings.phone_number
+        sheet["A4"] = settings.email
+        sheet["A6"] = "Date"
+        sheet["B6"] = str(today)
+
+        sheet["A8"] = "Total Sales"
+        sheet["B8"] = float(sales)
+
+        sheet["A9"] = "Total Expenses"
+        sheet["B9"] = float(expenses)
+
+        sheet["A10"] = "Net Profit"
+        sheet["B10"] = float(sales) - float(expenses)
+
+        response = HttpResponse(
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+        response[
+            "Content-Disposition"
+        ] = 'attachment; filename="business_report.xlsx"'
+
+        workbook.save(response)
+
+        return response
+
+class ExportReportPDFView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+
+        response = HttpResponse(
+            content_type="application/pdf"
+        )
+
+        settings = Setting.load()
+
+        response["Content-Disposition"] = (
+            'attachment; filename="business_report.pdf"'
+        )
+
+        doc = SimpleDocTemplate(response)
+
+        styles = getSampleStyleSheet()
+
+        styles["Title"].alignment = 1
+        styles["Normal"].alignment = 1
+
+        elements = []
+
+        # Business Logo
+        if settings.logo:
+            try:
+                logo = Image(settings.logo.path)
+
+                logo.drawHeight = 1.0 * inch
+                logo.drawWidth = 1.0 * inch
+
+                logo.hAlign = "CENTER"
+
+                elements.append(logo)
+
+            except Exception:
+                pass
+
+
+        elements.append(
+            Paragraph(
+                f"<b>{settings.business_name}</b>",
+                styles["Title"],
+            )
+        )
+
+        elements.append(
+            Paragraph(
+                settings.business_address or "",
+                styles["Normal"],
+            )
+        )
+
+        elements.append(
+            Paragraph(
+                settings.phone_number or "",
+                styles["Normal"],
+            )
+        )
+
+        elements.append(
+            Paragraph(
+                settings.email or "",
+                styles["Normal"],
+            )
+        )
+
+        elements.append(
+            Paragraph("<br/>", styles["Normal"])
+        )
+        elements.append(
+            Paragraph(
+                f"Generated: {timezone.localdate()}",
+                styles["Normal"],
+            )
+        )
+
+        elements.append(
+            Paragraph("<br/>", styles["Normal"])
+        )
+
+        total_sales = (
+            Sale.objects.filter(status="COMPLETED")
+            .aggregate(total=Sum("total_amount"))
+            .get("total")
+            or 0
+        )
+
+        total_expenses = (
+            Expense.objects.aggregate(total=Sum("amount"))
+            .get("total")
+            or 0
+        )
+
+        data = [
+            ["Metric", "Value"],
+            ["Total Sales", f"₦{total_sales:,.2f}"],
+            ["Total Expenses", f"₦{total_expenses:,.2f}"],
+            [
+                "Net Profit",
+                f"₦{float(total_sales)-float(total_expenses):,.2f}",
+            ],
+        ]
+
+        table = Table(data, colWidths=[3 * inch, 2 * inch])
+
+        table.setStyle(
+            TableStyle(
+                [
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#2563eb")),
+                    ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                    ("GRID", (0, 0), (-1, -1), 1, colors.grey),
+                    ("BACKGROUND", (0, 1), (-1, -1), colors.whitesmoke),
+                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                    ("BOTTOMPADDING", (0, 0), (-1, 0), 10),
+                    ("TOPPADDING", (0, 1), (-1, -1), 8),
+                    ("BOTTOMPADDING", (0, 1), (-1, -1), 8),
+                ]
+            )
+        )
+
+        elements.append(table)
+
+        doc.build(elements)
+
+        return response

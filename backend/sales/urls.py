@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import ReturnSaleAPIView
+from .views import ExportSalesCSVAPIView
 
 from .views import (
     SaleListCreateView,
@@ -7,13 +8,23 @@ from .views import (
     CheckoutView,
     ReturnSaleAPIView,
     SaleReturnListAPIView,
+    SaleReceiptAPIView,
+    ExportSalesCSVAPIView,
+    ExportSalesExcelAPIView,
 )
 
 urlpatterns = [
+
     path(
         "",
         SaleListCreateView.as_view(),
         name="sale-list",
+    ),
+
+    path(
+        "<int:sale_id>/receipt/",
+        SaleReceiptAPIView,
+        name="sale-receipt",
     ),
 
     path(
@@ -38,5 +49,17 @@ urlpatterns = [
         "returns/",
         SaleReturnListAPIView.as_view(),
         name="sale-return-list",
+    ),
+
+    path(
+        "export/csv/",
+        ExportSalesCSVAPIView,
+        name="sales-export-csv",
+    ),
+
+    path(
+        "export/excel/",
+        ExportSalesExcelAPIView,
+        name="sales-export-excel",
     ),
 ]

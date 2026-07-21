@@ -27,6 +27,11 @@ from django.db import transaction
 
 from notifications.utils import create_notification
 from notifications.models import Notification
+from rest_framework.decorators import api_view, permission_classes
+import csv
+from django.http import HttpResponse
+from openpyxl import Workbook
+from openpyxl.styles import Font
 
 
 
@@ -253,3 +258,132 @@ class SaleReturnListAPIView(generics.ListAPIView):
             )
 
         return queryset
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def SaleReceiptAPIView(request, sale_id):
+
+    sale = get_object_or_404(
+        Sale.objects.prefetch_related("items__product"),
+        id=sale_id,
+    )
+
+    serializer = SaleSerializer(sale)
+
+    return Response(serializer.data)
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def ExportSalesCSVAPIView(request):
+
+    receipt = request.GET.get("receipt")
+    date = request.GET.get("date")
+
+    sales = Sale.objects.all().order_by("-created_at")
+
+    if receipt:
+        sales = sales.filter(
+            receipt_number__icontains=receipt
+        )
+
+    if date:
+        sales = sales.filter(
+            created_at__date=date
+        )
+
+    response = HttpResponse(content_type="text/csv")
+
+    response["Content-Disposition"] = (
+        'attachment; filename="sales.csv"'
+    )
+
+    writer = csv.writer(response)
+
+    writer.writerow([
+        "Receipt",
+        "Date",
+        "Cashier",
+        "Payment",
+        "Status",
+        "Subtotal",
+        "Discount",
+        "Total",
+    ])
+
+    for sale in sales:
+        writer.writerow([
+            sale.receipt_number,
+            sale.created_at.strftime("%d/%m/%Y %H:%M"),
+            sale.cashier.username,
+            sale.get_payment_method_display(),
+            sale.get_status_display(),
+            sale.subtotal,
+            sale.discount,
+            sale.total_amount,
+        ])
+
+    return response
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def ExportSalesExcelAPIView(request):
+
+    receipt = request.GET.get("receipt")
+    date = request.GET.get("date")
+
+    sales = Sale.objects.all().order_by("-created_at")
+
+    if receipt:
+        sales = sales.filter(
+            receipt_number__icontains=receipt
+        )
+
+    if date:
+        sales = sales.filter(
+            created_at__date=date
+        )
+
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = "Sales"
+
+    headers = [
+        "Receipt",
+        "Date",
+        "Cashier",
+        "Payment",
+        "Status",
+        "Subtotal",
+        "Discount",
+        "Total",
+    ]
+
+    for col_num, header in enumerate(headers, 1):
+        cell = sheet.cell(row=1, column=col_num)
+        cell.value = header
+        cell.font = Font(bold=True)
+
+    row = 2
+
+    for sale in sales:
+        sheet.cell(row=row, column=1).value = sale.receipt_number
+        sheet.cell(row=row, column=2).value = sale.created_at.strftime("%d/%m/%Y %H:%M")
+        sheet.cell(row=row, column=3).value = sale.cashier.username
+        sheet.cell(row=row, column=4).value = sale.get_payment_method_display()
+        sheet.cell(row=row, column=5).value = sale.get_status_display()
+        sheet.cell(row=row, column=6).value = float(sale.subtotal)
+        sheet.cell(row=row, column=7).value = float(sale.discount)
+        sheet.cell(row=row, column=8).value = float(sale.total_amount)
+
+        row += 1
+
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+    response["Content-Disposition"] = (
+        'attachment; filename="sales.xlsx"'
+    )
+
+    workbook.save(response)
+
+    return response
