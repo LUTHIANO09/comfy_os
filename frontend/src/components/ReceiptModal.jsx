@@ -162,7 +162,7 @@ const handlePrint = () => {
                 <img
                     src={settings?.logo}
                     alt="Business Logo"
-                    className="h-20 w-20 object-contain"
+                    className="w-full h-32 object-cover"
                     onLoad={() => console.log("Logo loaded")}
                     onError={(e) => console.log("Image failed", e)}
                 />
