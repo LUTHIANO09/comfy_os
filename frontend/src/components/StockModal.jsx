@@ -4,6 +4,7 @@ import {
   addStock,
   removeStock,
 } from "../services/inventoryService";
+import { toast } from "react-toastify";
 
 function StockModal({
   open,
@@ -28,7 +29,7 @@ function StockModal({
       );
     }
 
-    alert(
+    toast.success(
       mode === "add"
         ? "Stock added successfully."
         : "Stock removed successfully."
@@ -47,7 +48,7 @@ function StockModal({
       error.response?.data?.error ||
       "Operation failed.";
 
-    alert(message);
+    toast.error(message);
   }
 };
 

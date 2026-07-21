@@ -10,6 +10,10 @@ import ConfirmModal from "../components/ui/ConfirmModal";
 
 import { toast } from "react-toastify";
 
+import { exportSalesCSV } from "../services/exportService";
+
+import { saveAs } from "file-saver";
+
 function SalesHistory() {
   const [sales, setSales] = useState([]);
 
@@ -48,6 +52,28 @@ const fetchSales = async () => {
     console.error(error);
   }
 };
+
+const handleExportCSV = async () => {
+    try {
+      const blob = await exportSalesCSV(receipt, date);
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "sales.csv";
+
+      document.body.appendChild(link);
+      link.click();
+
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };  
+  
 
 
 return (
@@ -145,6 +171,23 @@ return (
             "
         >
             Clear Filters
+        </button>
+
+        <button
+            onClick={handleExportCSV}
+            className="
+                h-11
+                px-6
+                rounded-lg
+                bg-green-600
+                hover:bg-green-700
+                text-white
+                font-medium
+                whitespace-nowrap
+                transition
+            "
+        >
+            Export CSV
         </button>
 
     </div>

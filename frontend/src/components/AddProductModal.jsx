@@ -6,6 +6,7 @@ import {
 } from "../services/productService";
 import { useEffect, useState } from "react";
 import { getCategories } from "../services/categoryService";
+import { toast } from "react-toastify";
 
 
 
@@ -128,11 +129,11 @@ const handleSubmit = async () => {
     if (product) {
       await updateProduct(product.id, formData);
 
-      alert("Product updated successfully!");
+      toast.success("Product updated successfully!");
     } else {
       await createProduct(formData);
 
-      alert("Product created successfully!");
+      toast.success("Product created successfully!");
     }
 
     onSuccess();
@@ -141,7 +142,7 @@ const handleSubmit = async () => {
 
   } catch (error) {
     console.error(error);
-    alert("Operation failed.");
+    toast.error("Operation failed.");
   }
 };
 

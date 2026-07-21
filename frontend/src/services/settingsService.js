@@ -3,7 +3,13 @@ import api from "./api";
 export const getSettings = async () => {
   const response = await api.get("/settings/");
 
-  return response.data;
+  const data = response.data;
+
+  if (data.logo) {
+    data.logo = `http://127.0.0.1:8000${data.logo}`;
+  }
+
+  return data;
 };
 
 export const updateSettings = async (data) => {

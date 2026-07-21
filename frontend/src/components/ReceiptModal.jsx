@@ -10,17 +10,21 @@ function ReceiptModal({ sale, onClose }) {
   const [settings, setSettings] = useState(null);
 
         useEffect(() => {
-        const loadSettings = async () => {
-            try {
-            const data = await getSettings();
-            setSettings(data);
-            } catch (error) {
-            console.error(error);
-            }
-        };
+            const loadSettings = async () => {
+                try {
+                const data = await getSettings();
 
-        loadSettings();
-        }, []);
+                console.log(data);
+                console.log(data.logo);
+
+                setSettings(data);
+                } catch (error) {
+                console.error(error);
+                }
+            };
+
+            loadSettings();
+            }, []);
 
         if (!sale) return null;
 
@@ -38,10 +42,12 @@ const handlePrint = () => {
         <style>
 
           body{
-            font-family: Arial, Helvetica, sans-serif;
-            margin:0;
+            width:80mm;
+            margin:0 auto;
             padding:0;
             background:#fff;
+            font-family:Arial, Helvetica, sans-serif;
+            color:#000;
         }
 
         *{
@@ -49,7 +55,9 @@ const handlePrint = () => {
         }
 
         img{
-            max-width:120px;
+            max-width:80px;
+            display:block;
+            margin:auto;
         }
 
         hr{
@@ -62,7 +70,30 @@ const handlePrint = () => {
             text-align:center;
         }
         @page{
-            margin:8mm;
+            size:80mm auto;
+            margin:5mm;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        td,
+        th{
+            padding:4px 0;
+        }
+
+        .text-right{
+            text-align:right;
+        }
+
+        .text-center{
+            text-align:center;
+        }
+
+        .font-bold{
+            font-weight:bold;
         }
 
         </style>
@@ -89,9 +120,9 @@ const handlePrint = () => {
 };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 p-6">
 
-            <div className="w-full max-w-[360px]">
+        <div className="mx-auto w-full max-w-[360px]">
 
             {/* Buttons (NOT printed) */}
             <div className="mb-4 flex justify-end gap-3">
@@ -112,22 +143,30 @@ const handlePrint = () => {
 
             {/* Receipt (printed) */}
             <div
-            ref={receiptRef}
-            className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                ref={receiptRef}
+                className="
+                    bg-white
+                    rounded-lg
+                    shadow-2xl
+                    overflow-hidden
+                    border
+                    border-slate-200
+                "
+            >
 
         {/* Header */}
 
         <div className="border-b px-6 py-6">
 
-            {settings?.logo && (
-                <div className="flex justify-center mb-3">
+            <div className="flex justify-center mb-4">
                 <img
-                    src={settings.logo}
+                    src={settings?.logo}
                     alt="Business Logo"
-                    className="h-20 object-contain"
+                    className="h-20 w-20 object-contain"
+                    onLoad={() => console.log("Logo loaded")}
+                    onError={(e) => console.log("Image failed", e)}
                 />
-                </div>
-            )}
+            </div>
 
             <h2 className="text-center text-2xl font-bold">
                 {settings?.business_name || "COMFY FOOTWEARS"}
@@ -140,84 +179,117 @@ const handlePrint = () => {
             <div className="mt-4 space-y-1 text-center text-sm text-slate-500">
 
                 {settings?.business_address && (
-                <p>{settings.business_address}</p>
+                    <p>{settings.business_address}</p>
                 )}
 
                 {settings?.phone_number && (
-                <p>{settings.phone_number}</p>
+                    <p>{settings.phone_number}</p>
                 )}
 
                 {settings?.email && (
-                <p>{settings.email}</p>
+                    <p>{settings.email}</p>
                 )}
 
             </div>
 
-            </div>
-
+        </div>
         {/* Body */}
 
         <div className="p-6">
 
           <div className="space-y-3">
 
-           <div className="space-y-2 text-sm">
+                <div className="mb-4 text-center">
 
-                <div className="flex justify-between">
+            <div className="text-center">
 
-                    <span className="text-slate-500">
-                    Receipt No.
-                    </span>
+                <h2 className="text-xl font-bold tracking-wider">
+                    RECEIPT
+                </h2>
 
-                    <span className="font-semibold">
-                    {sale.receipt_number}
-                    </span>
-
+                <div
+                    className="
+                        mt-3
+                        inline-block
+                        rounded-full
+                        bg-slate-100
+                        px-4
+                        py-2
+                        text-sm
+                        font-semibold
+                        text-slate-700
+                    "
+                >
+                    #{sale.receipt_number}
                 </div>
 
-                <div className="flex justify-between">
+            </div>
 
-                    <span className="text-slate-500">
-                    Date
-                    </span>
+        </div>
 
-                    <span>
-                    {new Date(sale.created_at).toLocaleString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    })}
-                    </span>
+        <table className="w-full text-sm">
 
-                </div>
+                <tbody>
 
-                <div className="flex justify-between">
+                    <tr>
+                        <td className="py-1 text-slate-500">
+                            Transaction ID
+                        </td>
 
-                    <span className="text-slate-500">
-                    Cashier
-                    </span>
+                        <td className="py-1 text-right font-semibold">
+                            {sale.id}
+                        </td>
+                    </tr>
 
-                    <span>
-                    {sale.cashier_name}
-                    </span>
+                    <tr>
+                        <td className="py-1 text-slate-500">
+                            Receipt No.
+                        </td>
 
-                </div>
+                        <td className="py-1 text-right font-semibold">
+                            {sale.receipt_number}
+                        </td>
+                    </tr>
 
-                <div className="flex justify-between">
+                    <tr>
+                        <td className="py-1 text-slate-500">
+                            Date
+                        </td>
 
-                    <span className="text-slate-500">
-                    Payment
-                    </span>
+                        <td className="py-1 text-right">
+                            {new Date(sale.created_at).toLocaleString("en-GB", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            })}
+                        </td>
+                    </tr>
 
-                    <span>
-                    {sale.payment_method_display}
-                    </span>
+                    <tr>
+                        <td className="py-1 text-slate-500">
+                            Cashier
+                        </td>
 
-                </div>
+                        <td className="py-1 text-right">
+                            {sale.cashier_name}
+                        </td>
+                    </tr>
 
-                </div>
+                    <tr>
+                        <td className="py-1 text-slate-500">
+                            Payment
+                        </td>
+
+                        <td className="py-1 text-right">
+                            {sale.payment_method_display}
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
             <hr className="my-4" />
 
            <h3 className="font-semibold mb-3">
@@ -226,17 +298,17 @@ const handlePrint = () => {
 
                 <div className="border rounded-lg overflow-hidden">
 
-                    <div className="grid grid-cols-12 bg-slate-100 px-3 py-2 text-xs font-semibold uppercase">
+                   <div className="grid grid-cols-12 bg-slate-900 text-white px-3 py-2 text-xs font-semibold uppercase">
 
-                        <div className="col-span-6">
+                        <div className="col-span-5">
                             Product
                         </div>
 
-                        <div className="col-span-2 text-center">
-                            Qty
+                        <div className="col-span-4 text-center">
+                            Qty × Price
                         </div>
 
-                        <div className="col-span-4 text-right">
+                        <div className="col-span-3 text-right text-emerald-600">
                             Total
                         </div>
 
@@ -246,18 +318,19 @@ const handlePrint = () => {
 
                         <div
                             key={item.id}
-                            className="grid grid-cols-12 px-3 py-3 border-t text-sm"
+                            className="grid grid-cols-12 border-t px-3 py-3 text-sm"
                         >
 
-                            <div className="col-span-6">
+                            <div className="col-span-5 font-medium">
                                 {item.product_name}
                             </div>
 
-                            <div className="col-span-2 text-center">
-                                {item.quantity}
+                            <div className="col-span-4 text-center text-slate-600">
+                                {item.quantity} × {settings?.currency || "₦"}
+                                {Number(item.unit_price).toLocaleString()}
                             </div>
 
-                            <div className="col-span-4 text-right font-medium">
+                            <div className="col-span-3 text-right font-semibold">
                                 {settings?.currency || "₦"}
                                 {Number(item.total_price).toLocaleString()}
                             </div>
@@ -265,8 +338,29 @@ const handlePrint = () => {
                         </div>
 
                     ))}
+                    
 
                 </div>
+
+                <div className="mt-6 flex justify-center">
+
+    <div
+        className="
+            rounded-full
+            border-2
+            border-green-600
+            px-6
+            py-2
+            text-lg
+            font-bold
+            tracking-widest
+            text-green-600
+        "
+    >
+        PAID
+    </div>
+
+</div>
 
             <hr className="my-5" />
 
@@ -284,6 +378,23 @@ const handlePrint = () => {
         </span>
 
     </div>
+
+
+            <div className="flex justify-between">
+
+            <span className="text-slate-500">
+                Tax ({settings?.tax_percentage}%)
+            </span>
+
+            <span>
+                {settings?.currency || "₦"}
+                {(
+                    Number(sale.subtotal) *
+                    (Number(settings?.tax_percentage || 0) / 100)
+                ).toLocaleString()}
+            </span>
+
+        </div>
 
     <div className="flex justify-between">
 
