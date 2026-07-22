@@ -1,5 +1,8 @@
 from django.db import models
 from products.models import Product
+from accounts.models import User
+from notifications.models import Notification
+from notifications.utils import create_notification
 
 
 class Inventory(models.Model):
@@ -47,6 +50,33 @@ class Inventory(models.Model):
 
         self.quantity -= quantity
         self.save()
+
+        if self.quantity <= self.low_stock_threshold:
+
+            if self.quantity <= self.low_stock_threshold:
+
+                admins = User.objects.filter(role=User.Role.ADMIN)
+
+                for admin in admins:
+
+                    exists = Notification.objects.filter(
+                        user=admin,
+                        notification_type=Notification.NotificationType.LOW_STOCK,
+                        title="Low Stock Alert",
+                        message__contains=self.product.name,
+                        is_read=False,
+                    ).exists()
+
+                    if not exists:
+                        create_notification(
+                            user=admin,
+                            title="Low Stock Alert",
+                            message=(
+                                f"{self.product.name} is running low. "
+                                f"Only {self.quantity} item(s) remaining."
+                            ),
+                            notification_type=Notification.NotificationType.LOW_STOCK,
+                        )
 
         StockMovement.objects.create(
             inventory=self,

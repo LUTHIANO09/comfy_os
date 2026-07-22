@@ -10,6 +10,8 @@ from .serializers import (
 from notifications.utils import create_notification
 from notifications.models import Notification
 
+from audit.utils import create_audit_log
+from audit.models import AuditLog
 
 class ExpenseCategoryListCreateView(
     generics.ListCreateAPIView
@@ -53,6 +55,17 @@ class ExpenseListCreateView(
             notification_type=Notification.NotificationType.EXPENSE,
         )
 
+        create_audit_log(
+            user=self.request.user,
+            module="Expenses",
+            action=AuditLog.Action.CREATE,
+            description=(
+                f"Created expense '{expense.category.name}' "
+                f"worth ₦{expense.amount}"
+            ),
+            object_id=expense.id,
+        )
+
 
 class ExpenseRetrieveUpdateDestroyView(
     generics.RetrieveUpdateDestroyAPIView
@@ -69,3 +82,31 @@ class ExpenseRetrieveUpdateDestroyView(
         MultiPartParser,
         FormParser,
     )
+
+    def perform_update(self, serializer):
+        expense = serializer.save()
+
+        create_audit_log(
+            user=self.request.user,
+            module="Expenses",
+            action=AuditLog.Action.UPDATE,
+            description=(
+                f"Updated expense '{expense.category.name}'"
+            ),
+            object_id=expense.id,
+        )
+
+    def perform_destroy(self, instance):
+
+        create_audit_log(
+            user=self.request.user,
+            module="Expenses",
+            action=AuditLog.Action.DELETE,
+            description=(
+                f"Deleted expense '{instance.category.name}' "
+                f"worth ₦{instance.amount}"
+            ),
+            object_id=instance.id,
+        )
+
+        instance.delete()

@@ -3,7 +3,8 @@ from rest_framework.permissions import AllowAny
 from .models import Category, Product
 from .serializers import CategorySerializer, ProductSerializer
 from rest_framework.response import Response
-
+from audit.utils import create_audit_log
+from audit.models import AuditLog
 
 class CategoryListCreateView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
@@ -14,6 +15,17 @@ class ProductListCreateView(generics.ListCreateAPIView):
     queryset = Product.objects.filter(is_active=True)
     serializer_class = ProductSerializer
     permission_classes = [AllowAny]
+
+    def perform_create(self, serializer):
+        product = serializer.save()
+
+        create_audit_log(
+            user=self.request.user,
+            module="Products",
+            action=AuditLog.Action.CREATE,
+            description=f"Created product '{product.name}'",
+            object_id=product.id,
+        )
 
 
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -30,6 +42,14 @@ class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
             product.is_active = False
             product.save(update_fields=["is_active"])
 
+            create_audit_log(
+                user=request.user,
+                module="Products",
+                action=AuditLog.Action.DELETE,
+                description=f"Archived product '{product.name}'",
+                object_id=product.id,
+            )
+
             return Response(
                 {
                     "message": "Product archived because it has sales history.",
@@ -39,7 +59,18 @@ class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
             )
 
         # Product has never been sold → delete permanently
+        product_name = product.name
+        product_id = product.id
+
         self.perform_destroy(product)
+
+        create_audit_log(
+            user=request.user,
+            module="Products",
+            action=AuditLog.Action.DELETE,
+            description=f"Deleted product '{product_name}'",
+            object_id=product_id,
+        )
 
         return Response(
             {
@@ -47,4 +78,14 @@ class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
                 "action": "deleted",
             },
             status=status.HTTP_200_OK,
+        )
+    def perform_update(self, serializer):
+        product = serializer.save()
+
+        create_audit_log(
+            user=self.request.user,
+            module="Products",
+            action=AuditLog.Action.UPDATE,
+            description=f"Updated product '{product.name}'",
+            object_id=product.id,
         )

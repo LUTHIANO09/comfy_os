@@ -6,22 +6,24 @@ from .models import AuditLog
 class AuditLogAdmin(admin.ModelAdmin):
     list_display = (
         "user",
+        "module",
         "action",
-        "model_name",
+        "description",
         "created_at",
     )
 
     list_filter = (
-        "model_name",
+        "module",
+        "action",
         "created_at",
     )
 
     search_fields = (
-        "action",
-        "model_name",
+        "module",
         "description",
+        "user__username",
+        "user__full_name",
     )
 
-    ordering = (
-        "-created_at",
-    )
+    ordering = ("-created_at",)
+    

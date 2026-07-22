@@ -33,6 +33,9 @@ from django.http import HttpResponse
 from openpyxl import Workbook
 from openpyxl.styles import Font
 
+from audit.utils import create_audit_log
+from audit.models import AuditLog
+
 
 
 
@@ -161,6 +164,17 @@ class CheckoutView(APIView):
         sale.calculate_totals()
         sale.save()
 
+        create_audit_log(
+            user=request.user,
+            module="Sales",
+            action=AuditLog.Action.CREATE,
+            description=(
+                f"Completed sale {sale.receipt_number} "
+                f"worth ₦{sale.total_amount}"
+            ),
+            object_id=sale.id,
+        )
+
         create_notification(
             user=request.user,
             title="New Sale",
@@ -215,6 +229,16 @@ class ReturnSaleAPIView(APIView):
 
         sale.status = Sale.Status.RETURNED
         sale.save(update_fields=["status"])
+
+        create_audit_log(
+            user=request.user,
+            module="Sales",
+            action=AuditLog.Action.UPDATE,
+            description=(
+                f"Returned sale {sale.receipt_number}"
+            ),
+            object_id=sale.id,
+        )
 
         sale_return = SaleReturn.objects.create(
             sale=sale,

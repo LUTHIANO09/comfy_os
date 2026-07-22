@@ -19,6 +19,9 @@ from rest_framework import generics
 from notifications.utils import create_notification
 from notifications.models import Notification
 
+from audit.utils import create_audit_log
+from audit.models import AuditLog
+
 
 class RunPayrollAPIView(APIView):
     permission_classes = [AllowAny]
@@ -40,7 +43,7 @@ class RunPayrollAPIView(APIView):
 
         for employee in employees:
 
-            _, was_created = PayrollRecord.objects.get_or_create(
+            payroll_record, was_created = PayrollRecord.objects.get_or_create(
                 employee=employee,
                 period=period,
                 defaults={
@@ -50,6 +53,18 @@ class RunPayrollAPIView(APIView):
 
             if was_created:
                 created_records += 1
+
+            create_audit_log(
+                user=request.user,
+                module="Payroll",
+                action=AuditLog.Action.CREATE,
+                description=(
+                    f"Generated payroll for "
+                    f"{employee.full_name} "
+                    f"({period.month}/{period.year})"
+                ),
+                object_id=payroll_record.id,
+            )
 
         return Response({
             "message": "Payroll generated successfully.",
@@ -104,6 +119,18 @@ class PayPayrollAPIView(APIView):
             payroll.status = PayrollRecord.Status.PAID
             payroll.paid_at = timezone.now()
             payroll.save()
+
+            create_audit_log(
+                user=request.user,
+                module="Payroll",
+                action=AuditLog.Action.UPDATE,
+                description=(
+                    f"Paid salary to "
+                    f"{payroll.employee.full_name} "
+                    f"(₦{payroll.salary})"
+                ),
+                object_id=payroll.id,
+            )
 
         return Response({
             "message": "Salary paid successfully."
