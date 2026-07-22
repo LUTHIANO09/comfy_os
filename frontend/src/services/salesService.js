@@ -2,7 +2,7 @@ import api from "./api";
 
 export const getProductsForSale = async () => {
   const response = await api.get("products/");
-  return response.data;
+  return response.data.results;
 };
 
 export const checkoutSale = async (saleData) => {
@@ -44,5 +44,5 @@ export const getReturnedSales = async (receipt = "", date = "") => {
     },
   });
 
-  return response.data;
+  return response.data.results;
 };

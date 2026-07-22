@@ -19,6 +19,13 @@ function Navbar() {
   useEffect(() => {
       loadUser();
       loadNotifications();
+
+      const interval = setInterval(() => {
+          loadNotifications();
+      }, 60000);
+
+      return () => clearInterval(interval);
+
   }, []);
 
   const loadUser = async () => {
@@ -31,15 +38,15 @@ function Navbar() {
   };
 
   const loadNotifications = async () => {
-      try {
-          const data = await getNotifications();
+    try {
+      const data = await getNotifications();
 
-          setNotifications(data.notifications);
-          setUnreadCount(data.unread);
+      setNotifications(data.notifications || []);
+      setUnreadCount(data.unread || 0);
 
-      } catch (error) {
-          console.error(error);
-      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleReadNotification = async (notification) => {

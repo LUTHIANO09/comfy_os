@@ -16,9 +16,11 @@ import {
   ChevronDown,
   ChevronRight,
   LogOut,
+  ClipboardList
 } from "lucide-react";
 
 import { logout } from "../utils/auth";
+
 
 const menuGroups = [
   {
@@ -119,6 +121,11 @@ const menuGroups = [
     title: "System",
     items: [
       {
+        name: "Audit Logs",
+        icon: ClipboardList,
+        path: "/audit",
+      },
+      {
         name: "Settings",
         icon: Settings,
         path: "/settings",
@@ -151,7 +158,7 @@ function Sidebar() {
   if (["/expenses", "/reports"].includes(location.pathname))
     return "Finance";
 
-  if (["/settings"].includes(location.pathname))
+  if (["/settings", "/audit"].includes(location.pathname))
     return "System";
 
   return "";

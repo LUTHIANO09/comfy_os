@@ -2,7 +2,7 @@ import api from "./api";
 
 export const getCustomers = async () => {
   const response = await api.get("customers/");
-  return response.data;
+  return response.data.results;
 };
 
 export const createCustomer = async (customer) => {
@@ -27,9 +27,9 @@ export const updateCustomer = async (
 };
 
 export const deleteCustomer = async (id) => {
-  const response = await api.delete(
+  await api.delete(
     `customers/${id}/`
   );
 
-  return response.data;
+  
 };

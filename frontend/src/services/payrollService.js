@@ -2,7 +2,7 @@ import api from "./api";
 
 export const getPayrollRecords = async () => {
   const response = await api.get("/payroll/");
-  return response.data;
+  return response.data.results;
 };
 
 export const runPayroll = async () => {

@@ -2,7 +2,7 @@ import api from "./api";
 
 export const getEmployees = async () => {
   const response = await api.get("employees/");
-  return response.data;
+  return response.data.results;
 };
 
 export const createEmployee = async (employee) => {
@@ -27,9 +27,9 @@ export const updateEmployee = async (
 };
 
 export const deleteEmployee = async (id) => {
-  const response = await api.delete(
+  await api.delete(
     `employees/${id}/`
   );
-
-  return response.data;
+  
 };
+

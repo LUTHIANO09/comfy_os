@@ -11,7 +11,7 @@ export const getUsers = async () => {
     "accounts/users/"
   );
 
-  return response.data;
+  return response.data.results;
 };
 
 export const createUser = async (
@@ -40,7 +40,9 @@ export const updateUser = async (
 export const deleteUser = async (
   id
 ) => {
-  await api.delete(
+  const response = await api.delete(
     `accounts/users/${id}/`
   );
+
+  return response.data;
 };

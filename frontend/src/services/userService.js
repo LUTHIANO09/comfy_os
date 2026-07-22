@@ -6,7 +6,7 @@ export const getUsers = async () => {
     "accounts/users/"
   );
 
-  return response.data;
+  return response.data.results;
 };
 
 // Create user

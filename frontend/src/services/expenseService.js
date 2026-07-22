@@ -12,7 +12,7 @@ export const getExpenseCategories = async () => {
     "expenses/categories/"
   );
 
-  return response.data;
+  return response.data.results;
 };
 
 export const createExpenseCategory = async (
@@ -54,29 +54,27 @@ Expenses
 */
 
 export const getExpenses = async () => {
-  const response = await api.get(
-    "expenses/"
+  const response = await api.get("expenses/");
+  return response.data.results;
+};
+
+export const createExpense = async (
+  expense
+) => {
+  const response = await api.post(
+    "expenses/",
+    expense,
+    {
+      headers: {
+        "Content-Type":
+          "multipart/form-data",
+      },
+    }
   );
 
   return response.data;
 };
 
-export const createExpense = async (
-    expense
-    ) => {
-    const response = await api.post(
-        "expenses/",
-        expense,
-        {
-        headers: {
-            "Content-Type":
-            "multipart/form-data",
-        },
-        }
-    );
-
-    return response.data;
-    };
 
 
 export const updateExpense = async (
