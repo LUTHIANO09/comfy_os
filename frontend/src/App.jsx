@@ -21,6 +21,7 @@ import "react-toastify/dist/ReactToastify.css";
 import ReturnsHistory from "./pages/ReturnsHistory";
 import Payroll from "./pages/Payroll";
 import AuditLogs from "./pages/AuditLogs";
+import Landing from "./pages/Landing";
 
 
 function App() {
@@ -29,7 +30,9 @@ function App() {
 
       <Routes>
 
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<Landing />} />
+
+        <Route path="/login" element={<Login />} />
 
                     <Route
               path="/dashboard"
