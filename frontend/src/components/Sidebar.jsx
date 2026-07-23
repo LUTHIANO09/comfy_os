@@ -134,7 +134,10 @@ const menuGroups = [
   },
 ];
 
-function Sidebar() {
+function Sidebar({
+    sidebarOpen,
+    setSidebarOpen,
+}) {
   const location = useLocation();
   
   const getActiveMenu = () => {
@@ -187,17 +190,70 @@ const [openMenus, setOpenMenus] = useState({
 };
 
   return (
-    <aside className="flex h-screen w-72 flex-col bg-slate-950 text-white">
+    <>
+
+    {sidebarOpen && (
+
+    <div
+        className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+        onClick={() => setSidebarOpen(false)}
+    />
+
+    )}
+
+    <aside
+    className={`
+    fixed
+    left-0
+    top-0
+    z-50
+    flex
+    h-screen
+    w-72
+    flex-col
+    bg-slate-950
+    text-white
+    transition-transform
+    duration-300
+    lg:relative
+    lg:translate-x-0
+    ${
+    sidebarOpen
+    ? "translate-x-0"
+    : "-translate-x-full"
+    }
+    `}
+    >
 
       {/* Logo */}
       <div className="border-b border-slate-800 p-6">
-        <h1 className="text-2xl font-bold">
-          COMFY OS
-        </h1>
 
-        <p className="mt-1 text-sm text-slate-400">
-          Retail Management
-        </p>
+          <div className="flex items-center gap-4">
+
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-2xl font-bold text-white shadow-lg">
+
+                  C
+
+              </div>
+
+              <div>
+
+                  <h1 className="text-xl font-bold tracking-wide">
+
+                      COMFY OS
+
+                  </h1>
+
+                  <p className="text-sm text-slate-400">
+
+                      Retail Management Suite
+
+                  </p>
+
+              </div>
+
+          </div>
+
       </div>
 
       {/* Dashboard */}
@@ -205,10 +261,11 @@ const [openMenus, setOpenMenus] = useState({
 
         <NavLink
           to="/dashboard"
+          onClick={() => setSidebarOpen(false)}
           className={({ isActive }) =>
             `flex items-center gap-3 rounded-xl px-4 py-3 transition ${
               isActive
-                ? "bg-blue-600 text-white"
+                ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md"
                 : "text-slate-300 hover:bg-slate-800 hover:text-white"
             }`
           }
@@ -222,7 +279,7 @@ const [openMenus, setOpenMenus] = useState({
       </div>
 
       {/* Menu */}
-      <nav className="flex-1 px-4 py-3">
+      <nav className="flex-1 space-y-3 overflow-y-auto px-4 py-5">
 
         {menuGroups.map((group) => (
 
@@ -236,7 +293,9 @@ const [openMenus, setOpenMenus] = useState({
               className="flex w-full items-center justify-between rounded-xl px-4 py-3 font-medium text-slate-300 hover:bg-slate-800"
             >
 
-              <span>{group.title}</span>
+              <span className="font-semibold tracking-wide">
+                  {group.title}
+              </span>
 
               {openMenus[group.title] ? (
                 <ChevronDown size={18} />
@@ -257,6 +316,7 @@ const [openMenus, setOpenMenus] = useState({
                     <NavLink
                       key={item.name}
                       to={item.path}
+                      onClick={() => setSidebarOpen(false)}
                       className={({ isActive }) =>
                         `flex items-center gap-3 rounded-lg px-4 py-2 transition ${
                           isActive
@@ -288,8 +348,7 @@ const [openMenus, setOpenMenus] = useState({
 
         <button
           onClick={logout}
-          className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-slate-300 transition hover:bg-red-600 hover:text-white"
-        >
+          className="flex w-full items-center gap-3 rounded-xl border border-slate-700 px-4 py-3 text-slate-300 transition hover:border-red-500 hover:bg-red-600 hover:text-white"        >
           <LogOut size={20} />
 
           Logout
@@ -297,12 +356,14 @@ const [openMenus, setOpenMenus] = useState({
         </button>
 
         <p className="mt-5 text-center text-xs text-slate-500">
-          COMFY OS v1.0
+          Version 1.0 • Enterprise
         </p>
 
       </div>
 
     </aside>
+
+    </>
   );
 }
 

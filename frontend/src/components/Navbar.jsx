@@ -1,4 +1,13 @@
-import { Bell, Search, ChevronDown } from "lucide-react";
+import {
+    Bell,
+    Search,
+    ChevronDown,
+    Menu,
+    LogOut,
+    User,
+    Settings,
+} from "lucide-react";
+
 import { useEffect, useState } from "react";
 
 import { getCurrentUser } from "../services/authService";
@@ -9,12 +18,13 @@ import {
     markAllNotificationsRead,
 } from "../services/notificationService";
 
-function Navbar() {
+function Navbar({ setSidebarOpen }) {
 
   const [user, setUser] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   useEffect(() => {
       loadUser();
@@ -76,19 +86,50 @@ function Navbar() {
       }
   };
 
+  const handleLogout = () => {
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+      window.location.href = "/";
+  };
+
 
   return (
     <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8">
 
+      <button
+          onClick={() => setSidebarOpen(true)}
+          className="mr-4 rounded-xl p-2 hover:bg-slate-100 lg:hidden"
+      >
+          <Menu size={24}/>
+      </button>
+
       {/* Search */}
-      <div className="hidden md:flex items-center bg-slate-100 rounded-xl px-4 py-3 w-96">
+      <div
+          className="
+              hidden
+              lg:flex
+              items-center
+              w-[430px]
+              rounded-2xl
+              border
+              border-slate-200
+              bg-white
+              px-5
+              py-3
+              shadow-sm
+              transition
+              focus-within:border-blue-500
+              focus-within:ring-4
+              focus-within:ring-blue-100
+          "
+      >
         <Search size={18} className="text-slate-500" />
 
         <input
-          type="text"
-          placeholder="Search products, sales..."
-          className="ml-3 w-full bg-transparent outline-none text-sm"
-        />
+              type="text"
+              placeholder="Search products, customers, invoices..."
+              className="ml-3 w-full bg-transparent text-sm outline-none"
+          />
       </div>
 
       {/* Right Side */}
@@ -96,8 +137,17 @@ function Navbar() {
 
         <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="relative rounded-xl p-2 transition hover:bg-slate-100"
-          >
+              className="
+              relative
+              rounded-2xl
+              border
+              border-slate-200
+              bg-white
+              p-3
+              shadow-sm
+              transition
+              hover:shadow-md
+              ">
           <Bell size={22} />
 
           {unreadCount > 0 && (
@@ -144,7 +194,7 @@ function Navbar() {
 
               <div className="flex items-center justify-between border-b p-4">
 
-                  <h3 className="font-semibold text-slate-800">
+                  <h3 className="text-lg font-bold text-slate-900">
                       Notifications
                   </h3>
 
@@ -166,7 +216,7 @@ function Navbar() {
 
               </div>
 
-              <div className="max-h-96 overflow-y-auto">
+              <div className="max-h-[420px] overflow-y-auto">
 
                   {notifications.length === 0 ? (
 
@@ -185,7 +235,7 @@ function Navbar() {
                                     cursor-pointer
                                     border-b
                                     p-4
-                                    hover:bg-slate-50
+                                    hover:bg-blue-50
                                     ${
                                         notification.is_read
                                             ? "bg-white"
@@ -194,11 +244,11 @@ function Navbar() {
                                 `}
                             >
 
-                              <h4 className="font-semibold">
+                              <h4 className="font-semibold text-slate-900">
                                   {notification.title}
                               </h4>
 
-                              <p className="mt-1 text-sm text-slate-600">
+                              <p className="mt-2 text-sm leading-6 text-slate-500">
                                   {notification.message}
                               </p>
 
@@ -210,29 +260,116 @@ function Navbar() {
 
               </div>
 
+              <div className="hidden xl:flex flex-col items-end">
+
+                    <span className="text-xs uppercase tracking-widest text-slate-400">
+                        Today
+                    </span>
+
+                    <span className="font-semibold text-slate-700">
+
+                        {new Date().toLocaleDateString(undefined,{
+                            weekday:"short",
+                            day:"numeric",
+                            month:"short",
+                        })}
+
+                    </span>
+
+                </div>
+
           </div>
 
           )}
 
-        <div className="flex items-center gap-3 cursor-pointer">
+        <div className="relative">
 
-          <div className="w-11 h-11 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
-            {user?.full_name?.charAt(0) ||
-            user?.username?.charAt(0) ||
-            "U"}
-          </div>
+            <button
+                onClick={() => setShowProfile(!showProfile)}
+                className="flex items-center gap-3 rounded-xl p-2 hover:bg-slate-100"
+            >
 
-          <div className="hidden md:block">
-            <h4 className="font-semibold text-slate-800">
-              {user?.full_name || user?.username}
-            </h4>
+                <div
+                className="
+                    flex
+                    h-12
+                    w-12
+                    items-center
+                    justify-center
+                    rounded-2xl
+                    bg-gradient-to-br
+                    from-blue-600
+                    to-indigo-700
+                    font-bold
+                    text-white
+                    shadow-lg">
 
-            <p className="text-xs text-slate-500">
-              {user?.role}
-            </p>
-          </div>
+                    {user?.full_name?.charAt(0) ||
+                        user?.username?.charAt(0) ||
+                        "U"}
 
-          <ChevronDown size={18} className="text-slate-500" />
+                </div>
+
+                <div className="hidden text-left lg:block">
+
+                    <h4 className="text-sm font-bold text-slate-900">
+
+                        {user?.full_name || user?.username}
+
+                    </h4>
+
+                    <p className="text-xs uppercase tracking-wide text-slate-400">
+
+                        {user?.role}
+
+                    </p>
+
+                </div>
+
+                <ChevronDown size={18} />
+
+            </button>
+
+            {showProfile && (
+
+                <div className="absolute right-0 top-16 z-50 w-56 overflow-hidden rounded-2xl border bg-white shadow-xl">
+
+                    <button
+                        className="flex w-full items-center gap-3 px-5 py-4 hover:bg-slate-100"
+                    >
+
+                        <User size={18} />
+
+                        My Profile
+
+                    </button>
+
+                    <button
+                        className="flex w-full items-center gap-3 px-5 py-4 hover:bg-slate-100"
+                    >
+
+                        <Settings size={18} />
+
+                        Settings
+
+                    </button>
+
+                    <hr />
+
+                    <button
+                        onClick={handleLogout}
+                        className="flex w-full items-center gap-3 px-5 py-4 text-red-600 hover:bg-red-50"
+                    >
+
+                        <LogOut size={18} />
+
+                        Logout
+
+                    </button>
+
+                </div>
+
+            )}
 
         </div>
 
