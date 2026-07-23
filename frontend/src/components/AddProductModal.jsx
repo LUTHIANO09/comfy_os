@@ -151,7 +151,7 @@ const handleSubmit = async () => {
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
 
-      <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl">
+      <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl">
 
         {/* Header */}
 
@@ -172,7 +172,7 @@ const handleSubmit = async () => {
 
         {/* Body */}
 
-        <div className="p-6 space-y-5">
+        <div className="p-8 space-y-8">
 
           <div className="grid md:grid-cols-2 gap-5">
 
@@ -187,7 +187,7 @@ const handleSubmit = async () => {
                         name="category"
                         value={formData.category}
                         onChange={handleChange}
-                        className="w-full border rounded-xl p-3"
+                        className="w-full rounded-xl border border-slate-300 px-4 py-3 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none"
                     >
                         <option value="">Select Category</option>
 
@@ -210,7 +210,7 @@ const handleSubmit = async () => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full border rounded-xl p-3"
+                    className="w-full rounded-xl border border-slate-300 px-4 py-3 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none"
                     placeholder="Nike Air Max"
                     />
 
@@ -227,7 +227,7 @@ const handleSubmit = async () => {
                 name="sku"
                 value={formData.sku}
                 onChange={handleChange}
-                className="w-full border rounded-xl p-3"
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none"
                 placeholder="NK-001"
                 />
 
@@ -241,15 +241,15 @@ const handleSubmit = async () => {
                     Product Image
                 </label>
 
-                <div className="border-2 border-dashed rounded-xl p-6 text-center">
+                <div className="rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-8 text-center transition hover:border-blue-500">
 
                     {preview ? (
 
                     <img
-                        src={preview}
-                        alt="Preview"
-                        className="mx-auto h-44 rounded-xl object-cover"
-                    />
+                          src={preview}
+                          alt="Preview"
+                          className="mx-auto h-64 w-full max-w-sm rounded-2xl object-cover"
+                      />
 
                     ) : (
 
@@ -283,7 +283,7 @@ const handleSubmit = async () => {
                 value={formData.description}
                 onChange={handleChange}
                 rows="4"
-                className="w-full border rounded-xl p-3"
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none"
                 />
 
           </div>
@@ -301,7 +301,7 @@ const handleSubmit = async () => {
                 name="cost_price"
                 value={formData.cost_price}
                 onChange={handleChange}
-                className="w-full border rounded-xl p-3"
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none"
                 />
 
             </div>
@@ -317,7 +317,7 @@ const handleSubmit = async () => {
                 name="markup_percentage"
                 value={formData.markup_percentage}
                 onChange={handleChange}
-                className="w-full border rounded-xl p-3"
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none"
                 />
 
             </div>
@@ -327,7 +327,7 @@ const handleSubmit = async () => {
                         name="selling_price"
                         value={formData.selling_price}
                         onChange={handleChange}
-                        className="w-full border rounded-xl p-3"
+                        className="w-full rounded-xl border border-slate-300 px-4 py-3 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none"
                         />
 
           </div>
@@ -364,20 +364,20 @@ const handleSubmit = async () => {
 
         {/* Footer */}
 
-        <div className="flex justify-end gap-3 p-6 border-t">
+        <div className="flex justify-between border-t bg-slate-50 p-6">
 
           <button
-            onClick={onClose}
-            className="px-5 py-3 rounded-xl border"
-          >
-            Cancel
-          </button>
+                onClick={onClose}
+                className="rounded-xl border border-slate-300 px-6 py-3 font-medium hover:bg-slate-100"
+            >
+                Cancel
+            </button>
 
             <button
-            onClick={handleSubmit}
-            className="px-5 py-3 rounded-xl bg-blue-600 text-white hover:bg-blue-700"
+                onClick={handleSubmit}
+                className="rounded-xl bg-blue-600 px-8 py-3 font-semibold text-white transition hover:bg-blue-700"
             >
-            {product ? "Update Product" : "Save Product"}
+                {product ? "Update Product" : "Create Product"}
             </button>
         </div>
 

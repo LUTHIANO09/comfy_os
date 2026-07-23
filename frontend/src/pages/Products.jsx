@@ -104,14 +104,36 @@ const confirmDelete = async () => {
 
   return (
     <DashboardLayout>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">
-          Products
-        </h1>
+      <div className="mb-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
 
-        <p className="mt-2 text-slate-500">
-          Manage your inventory products.
-        </p>
+          <div>
+
+              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-blue-600">
+                  Inventory
+              </p>
+
+              <h1 className="mt-2 text-4xl font-bold text-slate-900">
+                  Product Management
+              </h1>
+
+              <p className="mt-3 text-slate-500">
+                  Manage your inventory, pricing, stock and product catalogue.
+              </p>
+
+          </div>
+
+          <div className="rounded-2xl border bg-white px-6 py-5 shadow-sm">
+
+              <p className="text-sm text-slate-500">
+                  Total Products
+              </p>
+
+              <h2 className="mt-2 text-4xl font-bold text-blue-600">
+                  {products.length}
+              </h2>
+
+          </div>
+
       </div>
 
       <ProductToolbar
